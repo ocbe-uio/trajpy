@@ -2,7 +2,7 @@
 Trajectory classifier for cell research
 
 
-## Features:
+## Features
 - Anomalous exponent
 - Fractal dimension
 - Gyration radius
