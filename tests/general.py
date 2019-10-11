@@ -18,6 +18,7 @@ class TestGeneral(unittest.TestCase):
         """
         traj = np.zeros((370, 4))
         path = os.environ['TRAVIS_BUILD_DIR']
+
         init_from_file = tj.Trajectory(path+'/data/samples/sample.csv',
                                        skip_header=1, delimiter=',')
         traj[:, 0] = np.copy(init_from_file._t)
@@ -28,7 +29,7 @@ class TestGeneral(unittest.TestCase):
         init_from_tuple = tj.Trajectory((t, x, y, z))
         self.assertEqual(init_from_array._r.all(), init_from_file._r.all())
         self.assertEqual(init_from_tuple._r.all(), init_from_file._r.all())
-
+        self.assertRaises(TypeError, tj.Trajectory, 1.0)
 
 if __name__ == '__main__':
     unittest.main()
