@@ -1,7 +1,5 @@
-import sys
-sys.path.insert(0, '../trajpy')
 import numpy as np
-import trajpy as tj
+import trajpy.trajpy as tj
 import unittest
 
 
@@ -24,6 +22,7 @@ class TestFeatures(unittest.TestCase):
 
         self.assertAlmostEqual(r.efficiency_(x1), 1.0, places=2)
         self.assertAlmostEqual(r.efficiency_(x2), 0.0, places=2)
+
 
 
 if __name__ == '__main__':

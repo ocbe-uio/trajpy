@@ -53,10 +53,21 @@ class Trajectory(object):
             self.efficiency = self.efficiency_(self._r)
 
     @staticmethod
-    def mean_squared_displacement(trajectory):
+    def ensemble_averaged_msd(trajectory):
         """
-        :return msd: calculates the mean squared displacement
-                           msd = sum_n^N (x(n)-x(0))**2
+            calculates the ensemble-averaged mean squared displacement
+            $\langle \mathbf{r}_n^2 \rangle = \frac{1}{N-n} \sum_{n=1}^{N-n} |\mathbf{x}_{i+n} - \mathbf{x}_n |^2$
+            $n = 1, \ldots, N-1$
+
+        """
+
+        return msd
+
+    @staticmethod
+    def time_averaged_msd(trajectory):
+        """
+            calculates the time-averaged mean squared displacement
+            $\langle \mathbf{r}_n^2 \rangle (t) = sum_n^N |\mathbf{x}_{n}-\mathbf{x}_0|**2$
         """
         msd = np.zeros(len(trajectory))
         for n in range(0, len(trajectory)):
