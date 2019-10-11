@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/username/projectname.svg?branch=master)](https://travis-ci.com/phydev/trajpy)
+[![Build Status](https://travis-ci.com/phydev/trajpy.svg?branch=master)](https://travis-ci.com/phydev/trajpy)
 
 # TrajPy
 Trajectory classifier for cell research
