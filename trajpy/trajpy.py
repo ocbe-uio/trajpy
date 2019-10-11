@@ -42,7 +42,7 @@ class Trajectory(object):
             raise TypeError('trajectory receives an array or a filename as input.')
 
         if compute_all:
-            self.msd = self.mean_squared_displacement(self._r)
+            self.msd = self.time_averaged_msd(self._r)
             self.fractal_dimension = self.fractal_dimension_(self._r)
             self.gyration_radius = self.gyration_radius_(self._r)
             self.asymmetry = self.asymmetry_(self.gyration_radius)
@@ -60,6 +60,7 @@ class Trajectory(object):
             $n = 1, \ldots, N-1$
 
         """
+        msd = trajectory
 
         return msd
 
@@ -235,30 +236,3 @@ class Trajectory(object):
             ((len(trajectory) - 1) * den)
 
         return efficiency
-
-
-if __name__ == '__main__':
-
-    N = 100
-    Length = 100
-    t = np.linspace(0, N, N)
-    #  r = np.random.rand(Length, 2)
-    r = np.zeros((Length, 2))
-    for i in range(0, Length):
-        r[i] = np.array([i, i])
-    t = Trajectory(r)
-
-    """
-    import matplotlib.pyplot as plt
-    r = []
-    for i in range(0, N):
-        r.append(np.random.rand(Length,3))
-    r[:,0] = t
-    msd = np.zeros(Length)
-    for traj in r:
-        msd += Trajectory.mean_squared_displacement(traj)
-    msd = msd/N
-    a = Trajectory(r, compute_all=True)
-    plt.plot(msd)
-    plt.show()
-    """
