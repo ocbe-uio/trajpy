@@ -13,7 +13,7 @@ install:
 
 # Run the unit test
 script:
-  - coverage run tests/tests.py
+  - coverage run tests/computing_features.py
 
 # Push the results back to codecov
 after_success:
