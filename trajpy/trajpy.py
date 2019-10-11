@@ -1,82 +1,240 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import scipy.signal as signal
-from sklearn.linear_model import LinearRegression
+from scipy import signal
 
 
-class features(object):
+def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
+    """
+        this function calculates the nth moment of the trajectory r
 
-    def __init__(self, filename, plot=False):
-        self.r = np.genfromtxt(filename, skip_header=1)
-        self.shape = self.r.shape
-        self.size = self.r[:, 0].size
-        self.MSD = self.mean_squared_displacement()
-        self.dimension = self.fractal_dimension()
-        self.exponent = self.anomalous_exponent(plot)
+    :param trajectory: trajectory
+    :param l_size: box size
+    :param periodic: boundary conditions
+    :param order: momentum order
+    :return:
+    """
 
-    def mean_squared_displacement(self):
+    moment = np.zeros(trajectory.shape)
+    n_points = len(trajectory)
 
-        self.MSD = np.zeros(self.shape)
+    for n in range(0, n_points - 1):
 
-        for n in range(0, self.size):
-            try:
-                self.MSD[n, :] = np.sum(np.power(self.r[n, :] - self.r[0, :], 2))
-            except:
-                self.MSD[n] = np.sum(np.power(self.r[n, :] - self.r[0, :], 2))
+        dr = trajectory[n + 1] - trajectory[n]
 
-        self.MSD = signal.savgol_filter(self.MSD, 3, 1, mode='nearest')
+        if periodic:
+            dr = dr - np.round(dr / l_size, decimals=0) * l_size
 
-        return self.MSD# /np.std(m)
-
-
-
-    def fractal_dimension(self):
-
-        dr = np.zeros(np.power(self.size, 2))
-
-        n = 0
-        for i in range(0, self.size - 1):
-            for j in range(i + 1, self.size - 1):
-                dr[n] = np.sum(np.power(self.r[i, :] - self.r[j, :], 2))
-                n += 1
-
-        d = np.sqrt(np.max(dr))
-        N = self.size
-        L = 0
-        diff = np.zeros(self.shape)
+        moment[n] = np.sum(np.power(dr, order))
+    return np.sum(moment) / (n_points - 1)
 
 
-        for i in range(0, self.size - 1):
-            diff[i,:] = np.round(self.r[i + 1,:], decimals=2) \
-                     - np.round(self.r[i,:], decimals=2)
-            L += np.sqrt(np.sum(np.power(diff[i,:], 2)))
+class Features(object):
 
-        self.dimension = np.round(np.log(N) / (np.log(N) + np.log(d * np.power(L, -1))), decimals=2)
-        return self.dimension
+    def __init__(self, trajectory=np.zeros((1, 2)), compute_all=False, **params):
+
+        if type(trajectory) == np.ndarray:
+            self._t, self._r = trajectory[:, 0], trajectory[:, 1:]
+        elif type(trajectory) == str:
+            trajectory = np.genfromtxt(trajectory, **params)
+            self._t, self._r = trajectory[:, 0], trajectory[:, 1:]
+        else:
+            raise TypeError('trajectory receives an array or a filename as input.')
+
+        if compute_all:
+            self.msd = self.mean_squared_displacement(self._r)
+            self.fractal_dimension = self.fractal_dimension_(self._r)
+            self.gyration_radius = self.gyration_radius_(self._r)
+            self.asymmetry = self.asymmetry_(self.gyration_radius)
+            self.straightness = self.straightness_(self._r)
+            self.kurtosis = self.kurtosis_(self._r)
+            self.gaussianity = self.gaussianity_(self._r)
+            self.msd_ratio = self.msd_ratio_(self._r)
+            self.efficiency = self.efficiency_(self._r)
+
+    @staticmethod
+    def mean_squared_displacement(trajectory):
+        """
+        :return msd: calculates the mean squared displacement
+                           msd = sum_n^N (x(n)-x(0))**2
+        """
+        msd = np.zeros(len(trajectory))
+        for n in range(0, len(trajectory)):
+            msd[n] = np.sum(np.power(trajectory[n] - trajectory[0], 2))
+        msd = signal.savgol_filter(msd, 3, 1, mode='nearest') / (len(trajectory) - 1)
+
+        return msd
+
+    @staticmethod
+    def fractal_dimension_(trajectory):
+        """
+        :return fractal_dimension: calculates the fractal dimension
+                                    log(N)/(log(dNL**-1)
+        """
+        dr = np.zeros(np.power(len(trajectory), 2))
+
+        # calculating the distance between each pair of points in the trajectory
+        n_distance = 0
+        for i_pos in range(0, len(trajectory) - 1):
+            for j_pos in range(i_pos + 1, len(trajectory) - 1):
+                dr[n_distance] = np.sum(np.power(trajectory[i_pos] - trajectory[j_pos], 2))
+                n_distance += 1
+
+        d_max = np.sqrt(np.max(dr))  # maximum distance between any two points of the trajectory
+        n_points = trajectory.size
+        length = 0
+        diff = np.zeros(trajectory.shape)
+
+        for i_pos in range(0, len(trajectory) - 1):
+            diff[i_pos] = np.round(trajectory[i_pos + 1], decimals=2) \
+                          - np.round(trajectory[i_pos], decimals=2)
+            length += np.sqrt(np.sum(np.power(diff[i_pos], 2)))
+
+        fractal_dimension = np.round(np.log(n_points) / (np.log(n_points)
+                                     + np.log(d_max * np.power(length, -1))), decimals=2)
+
+        return fractal_dimension
+
+    @staticmethod
+    def gyration_radius_(trajectory):
+        """
+            calculates the gyration radius tensor of the trajectory
+
+        :return gyration_radius:
+        """
+
+        dim = trajectory.shape[1]  # number of dimensions
+        r_gyr = np.zeros((dim, dim))  # gyration radius tensor
+        r_mean = np.mean(trajectory, axis=0)
+
+        for m in range(0, dim):
+            for n in range(0, dim):
+                r_gyr[m, n] = np.sum(np.matmul(trajectory[:, m] - r_mean[m],
+                                               trajectory[:, n] - r_mean[n]))
+
+        gyration_radius = r_gyr/trajectory.size
+
+        return gyration_radius
+
+    @staticmethod
+    def asymmetry_(gyration_radius):
+        """
+            takes the gyration radius as input and calculates the eigenvalues
+            then use the eigenvalues to estimate the asymmetry between axis
+
+        :param gyration_radius:
+        :return:
+        """
+
+        eigen_values = np.linalg.eigvals(gyration_radius)
+
+        asymmetry = - np.log(1. - np.power(eigen_values[0] - eigen_values[1], 2) /
+                             (2. * np.power(eigen_values[0] + eigen_values[1], 2)))
+
+        return asymmetry
+
+    @staticmethod
+    def straightness_(trajectory):
+        """
+            estimates how much straight is the trajectory
+        :param trajectory:
+        :return:
+        """
+        summation = 0.
+
+        for i_pos in range(1, len(trajectory)-1):
+            summation += np.sqrt(np.dot(trajectory[i_pos]-trajectory[i_pos-1],
+                                        trajectory[i_pos]-trajectory[i_pos-1]))
+        straightness = np.sqrt(np.dot(trajectory[-1]-trajectory[0],
+                                      trajectory[1-1]-trajectory[0]))/summation
+        return straightness
+
+    @staticmethod
+    def kurtosis_(trajectory):
+        """
+            calculates the kurtosis of the trajectory projecting the positions
+            along the principal axis calculated with the gyration radius
+        :param trajectory:
+        :return:
+        """
+
+        kurtosis = np.mean(trajectory)  # placeholder
+
+        return kurtosis
+
+    @staticmethod
+    def gaussianity_(trajectory):
+        """
+            measure of how close to a gaussian distribution is the trajectory
+        :param trajectory:
+        :return:
+        """
+        fourth_order = moment_(trajectory, 4)
+        second_order = moment_(trajectory, 2)
+
+        gaussianity = (2/3) * (fourth_order/second_order) - 1
+
+        return gaussianity
+
+    @staticmethod
+    def msd_ratio_(trajectory):
+        """
+            ratio of mean squared displacements
+        :param trajectory:
+        :return:
+        """
+        msd_ratio = np.mean(trajectory)  # placeHolder
+        return msd_ratio
+
+    @staticmethod
+    def trappedness_(diffusion_constant, r0):
+        """
+            estimate the trappedness probability
+        :param diffusion_constant:
+        :param r0:
+        :return:
+        """
+        trappedness = 1 - np.exp(0.2080 - 0.25117 * (diffusion_constant / np.power(r0, 2)))
+        return trappedness
+
+    @staticmethod
+    def efficiency_(trajectory):
+        """
+            calculates the efficiency of the movement
+        :param trajectory:
+        :return:
+        """
+        den = 0.
+
+        for n in range(1, len(trajectory)):
+            den += np.sum(np.power(trajectory[n] - trajectory[n - 1], 2))
+
+        efficiency = np.sum(np.power(trajectory[-1] - trajectory[0], 2)) / \
+            ((len(trajectory) - 1) * den)
+
+        return efficiency
 
 
-    def anomalous_exponent(self, plot=False):
+if __name__ == '__main__':
 
-        if plot:
-            plt.plot(self.r[:,0], self.MSD)
-            plt.show()
+    N = 100
+    Length = 100
+    t = np.linspace(0, N, N)
+    #  r = np.random.rand(Length, 2)
+    r = np.zeros((Length, 2))
+    for i in range(0, Length):
+        r[i] = np.array([i, i])
+    t = Features(r)
 
-        MSD_log = np.log(self.MSD[1:])
-        time_log = np.log(self.r[1:,0])
-
-        X, Y = time_log, MSD_log
-        X = X.reshape(-1, 1)
-
-        reg = LinearRegression()
-        X_test = X
-        X_r = X
-        reg.fit(X, Y)
-        X_test = X_test.reshape(-1, 1)
-        Y_pred = reg.predict(X_test)
-
-        if plot:
-            plt.plot(X_r, Y)
-            plt.plot(X_test, Y_pred)
-            plt.show()
-
-        return np.round(reg.coef_[0], decimals=2), np.round(reg.score(X,Y),decimals=4)
+    """
+    import matplotlib.pyplot as plt
+    r = []
+    for i in range(0, N):
+        r.append(np.random.rand(Length,3))
+    r[:,0] = t
+    msd = np.zeros(Length)
+    for traj in r:
+        msd += Trajectory.mean_squared_displacement(traj)
+    msd = msd/N
+    a = Trajectory(r, compute_all=True)
+    plt.plot(msd)
+    plt.show()
+    """
