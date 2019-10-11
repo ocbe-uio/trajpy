@@ -3,11 +3,20 @@ Trajectory classifier for cell research
 
 
 ## Features
-- Anomalous exponent
 - Fractal dimension
 - Gyration radius
-- Anisotropy
-- Sphericity
+- Straightness
+- Efficiency
+- Gaussianity
+- Asymmetry
+
+## Issue
+### Implement the following features
+- Trappedness
+- MSD ratio
+- Kurtosis
+- Trappedness
+
 
 ## Requirements
 - numpy >= 1.14.3
