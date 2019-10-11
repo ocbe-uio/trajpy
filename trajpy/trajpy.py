@@ -64,6 +64,17 @@ class Features(object):
         return msd
 
     @staticmethod
+    def anomalous_exponent_(mean_squared_displacement):
+        """
+            calculates the anomalous exponent
+        :param mean_squared_displacement:
+        :return:
+        """
+        anomalous_exponent = np.mean(mean_squared_displacement)  # placeholder
+
+        return anomalous_exponent
+
+    @staticmethod
     def fractal_dimension_(trajectory):
         """
         :return fractal_dimension: calculates the fractal dimension
