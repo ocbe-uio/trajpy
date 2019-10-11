@@ -15,12 +15,11 @@ Trajectory classifier for cell research
 - Gaussianity
 - Asymmetry
 
-## Issues
-### Implement the following features
+
+##### Implementing the following features:
 - Trappedness
 - MSD ratio
 - Kurtosis
-- Trappedness
 
 
 ## Requirements

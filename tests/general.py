@@ -16,7 +16,7 @@ class TestGeneral(unittest.TestCase):
             give the same result
         """
         traj = np.zeros((370, 4))
-        init_from_file = tj.Trajectory('../data/samples/sample.csv',
+        init_from_file = tj.Trajectory('/data/samples/sample.csv',
                                        skip_header=1, delimiter=',')
         traj[:, 0] = np.copy(init_from_file._t)
         traj[:, 1:] = np.copy(init_from_file._r)
