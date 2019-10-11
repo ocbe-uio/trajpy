@@ -6,7 +6,11 @@ import unittest
 
 
 class TestFeatures(unittest.TestCase):
-
+ 
+    @classmethod
+    def setUpClass(cls):
+        np.random.seed(0)
+        
     def test_efficiency(self):
         """
             test if the efficiency is being computed correctly for two extreme cases
@@ -18,8 +22,8 @@ class TestFeatures(unittest.TestCase):
 
         r = tj.Trajectory()
 
-        self.assertAlmostEqual(r.efficiency_(x1), 1.0)
-        self.assertAlmostEqual(r.efficiency_(x2), 0.0)
+        self.assertAlmostEqual(r.efficiency_(x1), 1.0, places=4)
+        self.assertAlmostEqual(r.efficiency_(x2), 0.0, places=4)
 
 
 if __name__ == '__main__':
