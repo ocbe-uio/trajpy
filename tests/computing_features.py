@@ -22,8 +22,8 @@ class TestFeatures(unittest.TestCase):
 
         r = tj.Trajectory()
 
-        self.assertAlmostEqual(r.efficiency_(x1), 1.0, places=4)
-        self.assertAlmostEqual(r.efficiency_(x2), 0.0, places=4)
+        self.assertAlmostEqual(r.efficiency_(x1), 1.0, places=2)
+        self.assertAlmostEqual(r.efficiency_(x2), 0.0, places=2)
 
 
 if __name__ == '__main__':
