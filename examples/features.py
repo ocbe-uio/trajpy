@@ -5,7 +5,7 @@ sys.path.insert(0, '../trajpy')
 import trajpy as tj
 
 filename = 'sample.csv'
-r = tj.features(filename)
+r = tj.Features(filename)
 
 
 #msd = mean_squared_displacement(r)
