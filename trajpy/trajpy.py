@@ -235,7 +235,7 @@ if __name__ == '__main__':
     r = np.zeros((Length, 2))
     for i in range(0, Length):
         r[i] = np.array([i, i])
-    t = Features(r)
+    t = Trajectory(r)
 
     """
     import matplotlib.pyplot as plt
