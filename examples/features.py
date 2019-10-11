@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, '../trajpy')
 import trajpy as tj
 
-filename = 'sample.csv'
+filename = 'samples.csv'
 r = tj.Features(filename)
 
 

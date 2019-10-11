@@ -34,7 +34,7 @@ class Trajectory(object):
         if type(trajectory) == np.ndarray:
             self._t, self._r = trajectory[:, 0], trajectory[:, 1:]
         elif type(trajectory) == tuple:
-            self._t, self._r = trajectory[0], trajectory[1]
+            self._t, self._r = np.asarray(trajectory[0]), np.asarray(trajectory[1:])
         elif type(trajectory) == str:
             trajectory = np.genfromtxt(trajectory, **params)
             self._t, self._r = trajectory[:, 0], trajectory[:, 1:]

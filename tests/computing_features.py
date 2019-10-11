@@ -8,7 +8,7 @@ class TestFeatures(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         np.random.seed(0)
-        
+
     def test_efficiency(self):
         """
             test if the efficiency is being computed correctly for two extreme cases
@@ -22,7 +22,6 @@ class TestFeatures(unittest.TestCase):
 
         self.assertAlmostEqual(r.efficiency_(x1), 1.0, places=2)
         self.assertAlmostEqual(r.efficiency_(x2), 0.0, places=2)
-
 
 
 if __name__ == '__main__':
