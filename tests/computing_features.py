@@ -1,6 +1,6 @@
 import sys
-
 sys.path.insert(0, '../trajpy')
+import numpy as np
 import trajpy as tj
 import unittest
 
