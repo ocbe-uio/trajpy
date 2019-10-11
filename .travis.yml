@@ -13,7 +13,7 @@ install:
 
 # Run the unit test
 script:
-  - coverage run tests/object_creation.py
+  - coverage run tests/tests.py
 
 # Push the results back to codecov
 after_success:
