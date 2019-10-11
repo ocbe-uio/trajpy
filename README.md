@@ -15,7 +15,7 @@ Trajectory classifier for cell research
 - Gaussianity
 - Asymmetry
 
-## Issue
+## Issues
 ### Implement the following features
 - Trappedness
 - MSD ratio
