@@ -33,7 +33,8 @@ class TestGeneral(unittest.TestCase):
         self.assertRaises(TypeError, tj.Trajectory, 1.0)
 
         try:
-            tj.Trajectory(traj, compute_all=True)
+            r = tj.Trajectory(traj)
+            r.compute_features()
         except Exception:
             self.fail("An error occurred when running compute_all!")
 
