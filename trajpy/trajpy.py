@@ -29,7 +29,7 @@ def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
 
 class Trajectory(object):
 
-    def __init__(self, trajectory=np.zeros((1, 2)), compute_all=False, **params):
+    def __init__(self, trajectory=np.zeros((1, 2)), **params):
 
         if type(trajectory) == np.ndarray:
             self._t, self._r = trajectory[:, 0], trajectory[:, 1:]
@@ -41,23 +41,23 @@ class Trajectory(object):
         else:
             raise TypeError('trajectory receives an array or a filename as input.')
 
-        if compute_all:
-            self.msd = self.time_averaged_msd(self._r)
-            self.fractal_dimension = self.fractal_dimension_(self._r)
-            self.gyration_radius = self.gyration_radius_(self._r)
-            self.asymmetry = self.asymmetry_(self.gyration_radius)
-            self.straightness = self.straightness_(self._r)
-            self.kurtosis = self.kurtosis_(self._r)
-            self.gaussianity = self.gaussianity_(self._r)
-            self.msd_ratio = self.msd_ratio_(self._r)
-            self.efficiency = self.efficiency_(self._r)
+    def compute_features(self):
+        self.msd = self.time_averaged_msd(self._r)
+        self.fractal_dimension = self.fractal_dimension_(self._r)
+        self.gyration_radius = self.gyration_radius_(self._r)
+        self.asymmetry = self.asymmetry_(self.gyration_radius)
+        self.straightness = self.straightness_(self._r)
+        self.kurtosis = self.kurtosis_(self._r)
+        self.gaussianity = self.gaussianity_(self._r)
+        self.msd_ratio = self.msd_ratio_(self._r)
+        self.efficiency = self.efficiency_(self._r)
 
     @staticmethod
     def ensemble_averaged_msd(trajectory):
         """
-            calculates the ensemble-averaged mean squared displacement
-            $\langle \mathbf{r}_n^2 \rangle = \frac{1}{N-n} \sum_{n=1}^{N-n} |\mathbf{x}_{i+n} - \mathbf{x}_n |^2$
-            $n = 1, \ldots, N-1$
+        calculates the ensemble-averaged mean squared displacement
+        $$\\langle \\mathbf{r}_n^2 \\rangle = \\frac{1}{N-n} \\sum_{n=1}^{N-n} |\\mathbf{x}_{i+n} - \\mathbf{x}_n |^2$$
+        $$n = 1, \\ldots, N-1$$
 
         """
         msd = trajectory
@@ -67,8 +67,8 @@ class Trajectory(object):
     @staticmethod
     def time_averaged_msd(trajectory):
         """
-            calculates the time-averaged mean squared displacement
-            $\langle \mathbf{r}_n^2 \rangle (t) = sum_n^N |\mathbf{x}_{n}-\mathbf{x}_0|**2$
+        calculates the time-averaged mean squared displacement
+        $$\\langle \\mathbf{r}_n^2 \\rangle (t) = sum_n^N |\\mathbf{x}_{n}-\\mathbf{x}_0|**2$$
         """
         msd = np.zeros(len(trajectory))
         for n in range(0, len(trajectory)):
@@ -78,13 +78,13 @@ class Trajectory(object):
         return msd
 
     @staticmethod
-    def anomalous_exponent_(mean_squared_displacement):
+    def anomalous_exponent_(msd):
         """
             calculates the anomalous exponent
-        :param mean_squared_displacement:
-        :return:
+        :param msd: mean square displacement
+        :return: diffusion nomalous exponent
         """
-        anomalous_exponent = np.mean(mean_squared_displacement)  # placeholder
+        anomalous_exponent = np.mean(msd)  # placeholder
 
         return anomalous_exponent
 
@@ -92,7 +92,7 @@ class Trajectory(object):
     def fractal_dimension_(trajectory):
         """
         :return fractal_dimension: calculates the fractal dimension
-                                    log(N)/(log(dNL**-1)
+                                    \\frac{\\log{(N)} }{ \\log{(dNL^{-1}}}
         """
         dr = np.zeros(np.power(len(trajectory), 2))
 
@@ -123,7 +123,7 @@ class Trajectory(object):
         """
             calculates the gyration radius tensor of the trajectory
 
-        :return gyration_radius:
+        :return gyration_radius: tensor
         """
 
         dim = trajectory.shape[1]  # number of dimensions
@@ -145,8 +145,8 @@ class Trajectory(object):
             takes the gyration radius as input and calculates the eigenvalues
             then use the eigenvalues to estimate the asymmetry between axis
 
-        :param gyration_radius:
-        :return:
+        :param gyration_radius: gyration radius tensor
+        :return: asymmetry coefficient
         """
 
         eigen_values = np.linalg.eigvals(gyration_radius)
@@ -160,8 +160,7 @@ class Trajectory(object):
     def straightness_(trajectory):
         """
             estimates how much straight is the trajectory
-        :param trajectory:
-        :return:
+        :return straightness: measure of linearity
         """
         summation = 0.
 
@@ -177,8 +176,7 @@ class Trajectory(object):
         """
             calculates the kurtosis of the trajectory projecting the positions
             along the principal axis calculated with the gyration radius
-        :param trajectory:
-        :return:
+        :return kurtosis:
         """
 
         kurtosis = np.mean(trajectory)  # placeholder
@@ -189,8 +187,7 @@ class Trajectory(object):
     def gaussianity_(trajectory):
         """
             measure of how close to a gaussian distribution is the trajectory
-        :param trajectory:
-        :return:
+        :return gaussianity: measure of similarity to a gaussian function
         """
         fourth_order = moment_(trajectory, 4)
         second_order = moment_(trajectory, 2)
@@ -203,8 +200,7 @@ class Trajectory(object):
     def msd_ratio_(trajectory):
         """
             ratio of mean squared displacements
-        :param trajectory:
-        :return:
+        :return msd_ratio:
         """
         msd_ratio = np.mean(trajectory)  # placeHolder
         return msd_ratio
@@ -224,8 +220,7 @@ class Trajectory(object):
     def efficiency_(trajectory):
         """
             calculates the efficiency of the movement
-        :param trajectory:
-        :return:
+        :return efficiency:
         """
         den = 0.
 
