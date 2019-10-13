@@ -41,7 +41,20 @@ class Trajectory(object):
         else:
             raise TypeError('trajectory receives an array or a filename as input.')
 
+        self.msd = None
+        self.fractal_dimension = None
+        self.gyration_radius = None
+        self.asymmetry = None
+        self.straightness = None
+        self.kurtosis = None
+        self.gaussianity = None
+        self.msd_ratio = None
+        self.efficiency = None
+
     def compute_features(self):
+        """
+            compute every feature for the trajectory saved in self._r
+        """
         self.msd = self.time_averaged_msd(self._r)
         self.fractal_dimension = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
