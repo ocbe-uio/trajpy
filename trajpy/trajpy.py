@@ -135,7 +135,7 @@ class Trajectory(object):
                 r_gyr[m, n] = np.sum(np.matmul(trajectory[:, m] - r_mean[m],
                                                trajectory[:, n] - r_mean[n]))
 
-        gyration_radius = r_gyr/trajectory.size
+        gyration_radius = np.sqrt(np.abs(r_gyr/trajectory.size))
 
         return gyration_radius
 
@@ -164,11 +164,12 @@ class Trajectory(object):
         """
         summation = 0.
 
-        for i_pos in range(1, len(trajectory)-1):
-            summation += np.sqrt(np.dot(trajectory[i_pos]-trajectory[i_pos-1],
-                                        trajectory[i_pos]-trajectory[i_pos-1]))
-        straightness = np.sqrt(np.dot(trajectory[-1]-trajectory[0],
-                                      trajectory[1-1]-trajectory[0]))/summation
+        for i_pos in range(1, len(trajectory) - 1):
+            summation += np.sqrt(np.dot(trajectory[i_pos] - trajectory[i_pos - 1],
+                                        trajectory[i_pos] - trajectory[i_pos - 1]))
+
+        straightness = np.sqrt(np.dot(trajectory[-1] - trajectory[0],
+                                      trajectory[-1] - trajectory[0]))/summation
         return straightness
 
     @staticmethod
