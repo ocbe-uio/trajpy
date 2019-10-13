@@ -23,6 +23,19 @@ class TestFeatures(unittest.TestCase):
         self.assertAlmostEqual(r.efficiency_(x1), 1.0, places=2)
         self.assertAlmostEqual(r.efficiency_(x2), 0.0, places=2)
 
+    def test_fractal_dimension(self):
+        """
+            test if the fractal dimension is being computed correctly
+        """
+
+        x1 = np.linspace(0, 100, 100)
+        x2 = np.random.rand(100)
+
+        r = tj.Trajectory()
+
+        self.assertAlmostEqual(r.fractal_dimension_(x1), 1.0, places=2)
+        self.assertGreaterEqual(r.fractal_dimension_(x2), 3.0)
+
 
 if __name__ == '__main__':
     unittest.main()
