@@ -19,6 +19,7 @@ install:
 # Run the unit test
 script:
   - coverage run tests/computing_features.py
+  - coverage run -a tests/computing_trajectories.py
   - coverage run -a tests/general.py
   - coverage report -m
 
