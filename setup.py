@@ -11,7 +11,7 @@ setup(
     author_email = 'mms@uc.pt',
     description = 'Trajectory classifier for cell research',
     license = 'GNU GPLv3',
-    platform = 'Python 3.6',
+    platform = 'Python 3.7',
     packages = find_packages(),
     install_requires = ['numpy >= 1.14.3',
                         'matplotlib >= 3.0.3',
