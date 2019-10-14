@@ -38,7 +38,7 @@ class TestFeatures(unittest.TestCase):
         self.assertAlmostEqual(r.fractal_dimension_(x1), 1.0, places=2)
         self.assertGreaterEqual(r.fractal_dimension_(x2), 3.0)
 
-    def test_gyration_radius(self):
+    def test_gyration_radius_and_asymmetry(self):
         """
             testing the radius of gyration for some basic cases
             circle: Rg = R/2
@@ -48,13 +48,23 @@ class TestFeatures(unittest.TestCase):
         radius = 10
         circle_gyr = np.array([[radius, 0.], [0., radius]])/2
 
+        x1 = np.linspace(0, 100, 1000)
+        x2 = np.cos(np.pi * np.linspace(0, 100, 1000))
+        x1x2 = np.array([x1, x2]).transpose()
+
         for n in range(0, length):
             circle[n] = radius * np.array([np.cos(np.pi * n/10), np.sin(np.pi * n/10)])
 
         r = tj.Trajectory()
         gyration_radius = r.gyration_radius_(circle)
 
+        asymmetry_oscillatory = r.asymmetry_(r.gyration_radius_(x1x2))
+        asymmetry_circle = r.asymmetry_(gyration_radius)
+
+        self.assertAlmostEqual(asymmetry_oscillatory, 0.60, places=1)
+        self.assertAlmostEqual(asymmetry_circle, 0.0, places=1)
         self.assertEqual(np.round(gyration_radius, 2).all(), np.round(circle_gyr, 2).all())
+
 
     def test_straightness(self):
         """

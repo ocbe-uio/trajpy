@@ -32,7 +32,7 @@ def anomalous_diffusion(n_steps, n_sample, time_step, alpha=.8):
     :param alpha: anomalous exponent
     :return x, y: time, array containing N_sample trajectories with Nsteps
     """
-    x = np.zeros(n_steps) * dt
+    x = np.zeros(n_steps) * time_step
     y = np.zeros((n_steps, n_sample))
 
     for i_sample in range(0, n_sample):
@@ -41,6 +41,10 @@ def anomalous_diffusion(n_steps, n_sample, time_step, alpha=.8):
             t = i_step * time_step
             y[i_step, i_sample] = weierstrass_mandelbrot(t, n_steps, alpha=alpha)
             x[i_step] = t
+
+    if n_sample == 1:
+        y = y.transpose()[0]
+
     return x, y
 
 
@@ -48,7 +52,7 @@ if __name__ == '__main__':
 
     # anomalous diffusion
     tsteps = 250
-    nsample = 5000
+    nsample = 1
     dt = 1.
     alphas = np.linspace(0.10, 2.1, 20)
 
