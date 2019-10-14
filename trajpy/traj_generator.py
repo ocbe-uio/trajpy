@@ -46,20 +46,3 @@ def anomalous_diffusion(n_steps, n_sample, time_step, alpha=.8):
         y = y.transpose()[0]
 
     return x, y
-
-
-if __name__ == '__main__':
-
-    # anomalous diffusion
-    tsteps = 250
-    nsample = 1
-    dt = 1.
-    alphas = np.linspace(0.10, 2.1, 20)
-
-    for value in alphas:
-
-        xa, ya = anomalous_diffusion(tsteps, nsample, dt, alpha=value)
-
-        for i in range(0, nsample):
-            np.savetxt('data/trj'+str(np.round(value, decimals=1))+str(i)+'.csv', ya[:, i], delimiter=",", header='m')
-            print(np.round(value, decimals=2), i)
