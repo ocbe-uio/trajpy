@@ -1,9 +1,8 @@
 import trajpy.traj_generator as tjg
 import numpy as np
 """
-    generate N anomalous trajectories for each value of alpha exponents 
-    ranging between 0.10 and 2.10 
-    
+    generate N anomalous trajectories for each value of alpha exponents
+    ranging between 0.10 and 2.10
 """
 
 t_steps = 250
