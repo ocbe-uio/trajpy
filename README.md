@@ -7,7 +7,7 @@
 
 
 # TrajPy
-Trajectory classifier for cell research
+Pythonic package for trajectory classification.
 
 
 ## Features
@@ -27,6 +27,7 @@ Trajectory classifier for cell research
 
 ## Requirements
 - numpy >= 1.14.3
-- matplotlib >= 3.0.3
 - scipy >= 1.2.1
 - scikit-learn >= 0.20.3
+- matplotlib >= 3.0.3
+

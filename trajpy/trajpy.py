@@ -30,15 +30,12 @@ def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
 class Trajectory(object):
 
     def __init__(self, trajectory=np.zeros((1, 2)), **params):
-
-        if type(trajectory) == np.ndarray:
-            self._t, self._r = trajectory[:, 0], trajectory[:, 1:]
-        elif type(trajectory) == tuple:
-            self._t, self._r = np.asarray(trajectory[0]), np.asarray(trajectory[1:])
-        elif type(trajectory) == str:
+        if type(trajectory) == str:
             trajectory = np.genfromtxt(trajectory, **params)
-            self._t, self._r = trajectory[:, 0], trajectory[:, 1:]
-        else:
+
+        try:
+            self._t, self._r = np.asarray(trajectory[0]), np.asarray(trajectory[1:])
+        except TypeError:
             raise TypeError('trajectory receives an array or a filename as input.')
 
         self.msd_ta = None
