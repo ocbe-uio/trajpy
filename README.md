@@ -11,6 +11,9 @@ Pythonic package for trajectory classification.
 
 
 ## Features
+- Ensemble-averaged MSD
+- Time-averaged MSD
+- Anomalous Exponent
 - Fractal dimension
 - Gyration radius
 - Straightness
