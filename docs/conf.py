@@ -39,12 +39,21 @@ release = '0.0.1'
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.doctest',
-    'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
-    'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
+    'sphinx.ext.intersphinx',
+    'nbsphinx',
 ]
+
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'scipy': ('https://docs.scipy.org/doc/scipy/reference/', None),
+    'matplotlib': ('https://matplotlib.org', None)
+}
+
+# Always re-execute notebooks when building the docs
+nbsphinx_execute = 'always'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
