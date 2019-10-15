@@ -9,7 +9,6 @@ Welcome to TrajPy's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 2
    intro
    installation
 
