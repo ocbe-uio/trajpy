@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.com/phydev/trajpy.svg?branch=master)](https://travis-ci.com/phydev/trajpy)
 [![PyUp](https://pyup.io/repos/github/phydev/trajpy/shield.svg?t=1570846676802)](https://pyup.io/repos/github/phydev/trajpy/)
 [![Python 3](https://pyup.io/repos/github/phydev/trajpy/python-3-shield.svg)](https://pyup.io/repos/github/phydev/trajpy/)
+[![Documentation Status](https://readthedocs.org/projects/trajpy/badge/?version=latest)](https://trajpy.readthedocs.io/en/latest/?badge=latest)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 
