@@ -1,5 +1,4 @@
 import numpy as np
-from scipy import signal
 
 
 def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
@@ -57,7 +56,8 @@ class Trajectory(object):
             compute every feature for the trajectory saved in self._r
         """
         self.msd_ta = self.time_averaged_msd(self._r)
-        self.msd_ea = self.ensemble_averaged_msd(self._r)
+        self.msd_ea = self.ensemble_averaged_msd(self._r,
+                                                 np.linspace(0, len(self._r), len(self._r)))
         self.fractal_dimension = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
         self.asymmetry = self.asymmetry_(self.gyration_radius)
@@ -68,14 +68,31 @@ class Trajectory(object):
         self.efficiency = self.efficiency_(self._r)
 
     @staticmethod
-    def ensemble_averaged_msd(trajectory):
+    def ensemble_averaged_msd(trajectory, tau):
         """
         calculates the ensemble-averaged mean squared displacement
         $$\\langle \\mathbf{r}_n^2 \\rangle = \\frac{1}{N-n} \\sum_{n=1}^{N-n} |\\mathbf{x}_{i+n} - \\mathbf{x}_n |^2$$
         $$n = 1, \\ldots, N-1$$
-
+        :param trajectory: trajectory array
+        :param tau: time lag, it can be a single value or an array
+        :return msd: return the ensemble averaged mean square displacement
         """
-        msd = trajectory
+        if type(tau) == int:
+            tau = np.asarray([tau])
+
+        msd = np.zeros(len(tau))
+        time_lag = 0
+        for value in tau:
+
+            dx = []
+
+            for n in range(0, len(trajectory) - value):
+                dx.append(trajectory[n + value] - trajectory[n])
+
+            dx = np.asarray(dx)
+
+            msd[time_lag] = np.sum(np.power(dx, 2)) / (trajectory.size - value + 1)
+            time_lag += 1
 
         return msd
 
@@ -84,11 +101,12 @@ class Trajectory(object):
         """
         calculates the time-averaged mean squared displacement
         $$\\langle \\mathbf{r}_n^2 \\rangle (t) = sum_n^N |\\mathbf{x}_{n}-\\mathbf{x}_0|**2$$
+        :return msd: time-averaged msd
         """
         msd = np.zeros(len(trajectory))
         for n in range(0, len(trajectory)):
             msd[n] = np.sum(np.power(trajectory[n] - trajectory[0], 2))
-        msd = signal.savgol_filter(msd, 3, 1, mode='nearest') / (len(trajectory) - 1)
+        msd = msd / (len(trajectory) - 1)
 
         return msd
 
