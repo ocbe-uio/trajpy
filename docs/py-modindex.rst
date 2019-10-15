@@ -1,25 +1,24 @@
 .. _apidocs:
 
- Module Documentation
+Module Documentation
 ====================
 
- Documentation for every module and function found in TrajPy.
+Documentation for every module and function found in TrajPy.
 
- TrajPy
+TrajPy
 -----
 
- .. automodule:: trajpy.trajpy
-   :members:
-   :special-members:
-   :exclude-members: __weakref__
-   :show-inheritance:
+.. automodule:: trajpy.trajpy
+  :members:
+  :special-members:
+  :exclude-members: __weakref__
+  :show-inheritance:
 
- Trajectory Generator
+Trajectory Generator
 ------
 
- .. automodule:: trajpy.traj_generator
-   :members:
-   :special-members:
-   :exclude-members: __weakref__
-   :show-inheritance:
-
+.. automodule:: trajpy.traj_generator
+  :members:
+  :special-members:
+  :exclude-members: __weakref__
+  :show-inheritance:
