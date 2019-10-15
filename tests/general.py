@@ -18,8 +18,8 @@ class TestGeneral(unittest.TestCase):
             - test if compute_all = True runs without error
         """
         traj = np.zeros((370, 4))
-        path = os.environ['TRAVIS_BUILD_DIR']
-
+        #path = os.environ['TRAVIS_BUILD_DIR']
+        path = "../"
         init_from_file = tj.Trajectory(path+'/data/samples/sample.csv',
                                        skip_header=1, delimiter=',')
         traj[:, 0] = np.copy(init_from_file._t)

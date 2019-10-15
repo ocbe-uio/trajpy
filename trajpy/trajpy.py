@@ -57,7 +57,7 @@ class Trajectory(object):
         """
         self.msd_ta = self.time_averaged_msd(self._r)
         self.msd_ea = self.ensemble_averaged_msd(self._r,
-                                                 np.linspace(0, len(self._r), len(self._r)))
+                                                 np.arange(len(self._r)))
         self.fractal_dimension = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
         self.asymmetry = self.asymmetry_(self.gyration_radius)
