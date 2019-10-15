@@ -6,7 +6,7 @@ Module Documentation
 Documentation for every module and function found in TrajPy.
 
 TrajPy
----
+-----
 
 .. automodule:: trajpy.trajpy
    :members:
