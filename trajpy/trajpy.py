@@ -71,7 +71,9 @@ class Trajectory(object):
     def ensemble_averaged_msd(trajectory, tau):
         """
         calculates the ensemble-averaged mean squared displacement
+        .. math::
         $$\\langle \\mathbf{r}_n^2 \\rangle = \\frac{1}{N-n} \\sum_{n=1}^{N-n} |\\mathbf{x}_{i+n} - \\mathbf{x}_n |^2$$
+        .. math::
         $$n = 1, \\ldots, N-1$$
         :param trajectory: trajectory array
         :param tau: time lag, it can be a single value or an array
@@ -100,6 +102,7 @@ class Trajectory(object):
     def time_averaged_msd(trajectory):
         """
         calculates the time-averaged mean squared displacement
+        .. math::
         $$\\langle \\mathbf{r}_n^2 \\rangle (t) = sum_n^N |\\mathbf{x}_{n}-\\mathbf{x}_0|**2$$
         :return msd: time-averaged msd
         """
@@ -125,7 +128,8 @@ class Trajectory(object):
     def fractal_dimension_(trajectory):
         """
         :return fractal_dimension: calculates the fractal dimension
-                                    \\frac{\\log{(N)} }{ \\log{(dNL^{-1}}}
+        .. math::
+                 $$\\frac{\\log{(N)} }{ \\log{(dNL^{-1}}}$$
         """
         dr = np.zeros(np.power(len(trajectory), 2))
 
