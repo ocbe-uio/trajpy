@@ -4,7 +4,9 @@ Tutorial
 
 Simple Example
 --------
-In this example a trajectory stored in a csv file will be loaded and the features computed. ::
+
+In this example the trajectory stored in a csv file will be loaded and the features computed.
+::
     import trajpy.trajpy as tj
 
     filename = 'data/samples/sample.csv'
