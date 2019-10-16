@@ -6,7 +6,7 @@ def weierstrass_mandelbrot(t, n_displacements, gamma=np.sqrt(np.pi), alpha=.8):
     calculates the weierstrass mandelbrot function
     
     .. math::
-        W(t) = \\sum_{-\\infty}^{\\infty} \\frac{\\cos{(\\phi_n )} - \\cos{(\\gamma^n t^* + \\phi_n )} }{\\gamma^{n\\alpha/2}}
+        W(t) = \\sum_{-\\infty}^{n = \\infty} \\frac{\\cos{(\\phi_n )} - \\cos{(\\gamma^n t^* + \\phi_n )} }{\\gamma^{n\\alpha/2}}
 
     :param t: time step
     :param n_displacements: number of displacements
