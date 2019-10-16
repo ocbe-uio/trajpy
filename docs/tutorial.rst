@@ -4,17 +4,15 @@ Tutorial
 
 Simple Example
 --------
-::
-  import trajpy.trajpy as tj
-  import numpy as np
-  import matplotlib.pyplot as plt
+In this example a trajectory stored in a csv file will be loaded and the features computed. ::
+    import trajpy.trajpy as tj
 
-  filename = 'data/samples/sample.csv'
-  r = tj.Trajectory(filename,
+    filename = 'data/samples/sample.csv'
+    r = tj.Trajectory(filename,
                     skip_header=1,
                     delimiter=',')
 
-  r.compute_features()
+    r.compute_features()
 
 
 Accessing Features
