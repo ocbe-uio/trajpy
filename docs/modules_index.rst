@@ -11,7 +11,7 @@ TrajPy
 .. automodule:: trajpy.trajpy
   :members:
   :special-members:
-  :exclude-members:
+  :exclude-members: __weakref__
   :show-inheritance:
 
 Trajectory Generator

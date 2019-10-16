@@ -27,7 +27,11 @@ def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
 
 
 class Trajectory(object):
-
+    """
+    This is the main class object in trajpy. It can be initialized
+    as a dummy object for calling its functions or you can initialize
+    it with a trajectory array or csv file.
+    """
     def __init__(self, trajectory=np.zeros((1, 2)), **params):
         if type(trajectory) == str:
             trajectory = np.genfromtxt(trajectory, **params)
