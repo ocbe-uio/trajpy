@@ -8,7 +8,11 @@ from your terminal. Then run the setup.py for installing ::
 
   python setup.py --install
 
-We are planning to host the project in pip soon in order to make installation easier.
+We have the package hosted in test.pypi, after the first release we will migrate it to PyPi.
+But for now you can install it from there using the following command: ::
+
+  pip install -i https://test.pypi.org/simple/ trajpy
+
 
 Dependencies
 ------------

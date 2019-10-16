@@ -4,12 +4,12 @@ this setup will check for dependencies and install TrajPy on your computer
 from setuptools import setup, find_packages
 
 setup(
-    name='TrajPy',
+    name='trajpy',
     version='0.0.1',
-    url='https://gitlab.com/phydev/trajpy.git',
+    url='https://github.com/phydev/trajpy.git',
     author='Mauricio Moreira',
     author_email='mms@uc.pt',
-    description='Trajectory classifier for cell research',
+    description='Trajectory classifier for cells, nanoparticles & whatelse.',
     license='GNU GPLv3',
     platform='Python 3.7',
     packages=find_packages(),
