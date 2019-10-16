@@ -135,7 +135,7 @@ class Trajectory(object):
         """
         :return fractal_dimension: calculates the fractal dimension
         .. math::
-                 \\frac{\\log{(N)} }{ \\log{(dNL^{-1}}}
+                 \\frac{\\log{(N)} }{ \\log{(dNL^{-1})}}
         """
         dr = np.zeros(np.power(len(trajectory), 2))
 
