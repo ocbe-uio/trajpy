@@ -75,6 +75,7 @@ class Trajectory(object):
     def ensemble_averaged_msd(trajectory, tau):
         """
         calculates the ensemble-averaged mean squared displacement
+        
         .. math::
             \\langle \\mathbf{r}_n^2 \\rangle = \\frac{1}{N-n} \\sum_{n=1}^{N-n} |\\mathbf{x}_{i+n} - \\mathbf{x}_n |^2
         .. math::
