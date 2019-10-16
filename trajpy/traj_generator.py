@@ -4,6 +4,7 @@ import numpy as np
 def weierstrass_mandelbrot(t, n_displacements, gamma=np.sqrt(np.pi), alpha=.8):
     """
     calculates the weierstrass mandelbrot function
+    
     .. math::
         W(t) = \\sum_{-\\infty}^{\\infty} \\frac{\\cos{(\\phi_n )} - \\cos{(\\gamma^n t^* + \\phi_n )} }{\\gamma^{n\\alpha/2}}}
 
