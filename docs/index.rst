@@ -11,6 +11,8 @@ Contents:
 .. toctree::
    intro
    installation
+   tutorial
+   modules_index
 
 
 Indices and tables
