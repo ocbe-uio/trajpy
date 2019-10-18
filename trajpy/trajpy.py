@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.linear_model import LinearRegression
 
 
 def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
@@ -59,17 +60,26 @@ class Trajectory(object):
         """
             compute every feature for the trajectory saved in self._r
         """
-        self.msd_ta = self.time_averaged_msd(self._r)
+        # self.msd_ta = self.time_averaged_msd(self._r)
         self.msd_ea = self.ensemble_averaged_msd(self._r,
                                                  np.arange(len(self._r)))
+        self.anomalous_exponent = self.anomalous_exponent_(self.msd_ea, self._t)
         self.fractal_dimension = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
         self.asymmetry = self.asymmetry_(self.gyration_radius)
         self.straightness = self.straightness_(self._r)
-        self.kurtosis = self.kurtosis_(self._r)
+        # self.kurtosis = self.kurtosis_(self._r)
         self.gaussianity = self.gaussianity_(self._r)
-        self.msd_ratio = self.msd_ratio_(self._r)
+        # self.msd_ratio = self.msd_ratio_(self._r)
         self.efficiency = self.efficiency_(self._r)
+
+        features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
+                    str(np.round(self.fractal_dimension, 4)) + ',' +
+                    str(np.round(self.asymmetry, 4)) + ',' +
+                    str(np.round(self.straightness, 4)) + ',' +
+                    str(np.round(self.gaussianity, 4)) + ',' +
+                    str(np.round(self.efficiency, 4)))
+        return features
 
     @staticmethod
     def ensemble_averaged_msd(trajectory, tau):
@@ -120,13 +130,24 @@ class Trajectory(object):
         return msd
 
     @staticmethod
-    def anomalous_exponent_(msd):
+    def anomalous_exponent_(msd, timelag):
         """
             calculates the anomalous exponent
         :param msd: mean square displacement
+        :param timelag: time interval
         :return: diffusion nomalous exponent
         """
-        anomalous_exponent = np.mean(msd)  # placeholder
+
+        msd_log = np.log(msd[1:])
+        time_log = np.log(timelag[1:])
+
+        x, y = time_log, msd_log
+        x = x.reshape(-1, 1)
+
+        reg = LinearRegression()
+        reg.fit(x, y)
+
+        anomalous_exponent = np.round(reg.coef_[0], decimals=2)
 
         return anomalous_exponent
 
