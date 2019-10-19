@@ -34,6 +34,16 @@ class Trajectory(object):
     it with a trajectory array or csv file.
     """
     def __init__(self, trajectory=np.zeros((1, 2)), **params):
+        """
+        init function that can be left blank for using staticmethods.
+        It can be initialized with an array with shape (N, dimensions)
+        where dimensions is the number of spatial dimensions plus the time component.
+        The first column must be the time, followed by the x- y-axis.
+        It also accepts tuples (t, x, y) or csv files.
+
+        :param trajectory: 2D trajectory as a function of time (t, x, y)
+        :param params: use params for passing parameters into np.genfromtxt()
+        """
         if type(trajectory) == str:
             trajectory = np.genfromtxt(trajectory, **params)
 
