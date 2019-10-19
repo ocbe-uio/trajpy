@@ -35,11 +35,14 @@ class Trajectory(object):
     """
     def __init__(self, trajectory=np.zeros((1, 2)), **params):
         """
-        init function that can be left blank for using staticmethods.
-        It can be initialized with an array with shape (N, dimensions)
-        where dimensions is the number of spatial dimensions plus the time component.
-        The first column must be the time, followed by the x- y-axis.
+        Initialization function that can be left blank for using staticmethods.
+        It can be initialized with an array with shape (N, dim)
+        where dim is the number of spatial dimensions plus the time component.
+        The first column must be the time, followed by the x- and y-axis.
         It also accepts tuples (t, x, y) or csv files.
+
+        The trajectory will be split between the temporal component self._t
+        and the spatial axis self._r.
 
         :param trajectory: 2D trajectory as a function of time (t, x, y)
         :param params: use params for passing parameters into np.genfromtxt()
@@ -142,7 +145,9 @@ class Trajectory(object):
     @staticmethod
     def anomalous_exponent_(msd, timelag):
         """
-            calculates the anomalous exponent
+        Calculates the diffusion anomalous exponent
+        .. math::
+            \\alpha = \\frac{ \ln{\\left( \\langle x^2 \\rangle   \\right)} }{ \ln{(t)} }
         :param msd: mean square displacement
         :param timelag: time interval
         :return: diffusion nomalous exponent
@@ -164,9 +169,12 @@ class Trajectory(object):
     @staticmethod
     def fractal_dimension_(trajectory):
         """
-        :return fractal_dimension: calculates the fractal dimension
+        Estimates the fractal dimension of the trajectory
+
         .. math::
                  \\frac{\\log{(N)} }{ \\log{(dNL^{-1})}}
+
+        :return fractal_dimension: returns the fractal dimension
         """
         dr = np.zeros(np.power(len(trajectory), 2))
 
@@ -195,7 +203,7 @@ class Trajectory(object):
     @staticmethod
     def gyration_radius_(trajectory):
         """
-            calculates the gyration radius tensor of the trajectory
+        Calculates the gyration radius tensor of the trajectory
 
         :return gyration_radius: tensor
         """
@@ -216,8 +224,14 @@ class Trajectory(object):
     @staticmethod
     def asymmetry_(gyration_radius):
         """
-            takes the gyration radius as input and calculates the eigenvalues
-            then use the eigenvalues to estimate the asymmetry between axis
+        Takes the gyration radius as input and calculates the eigenvalues
+        then use the eigenvalues to estimate the asymmetry between axis
+
+        .. math::
+            a = - \\log \\left(1 - \\frac{ ( \\lambda_1 - \\lambda_2)^2}{2 ( \\lambda_1 + \\lambda_2)^2} \\right)
+
+        TODO: this function is specific to 2-dimensional systems,
+            it should be generalized in next versions.
 
         :param gyration_radius: gyration radius tensor
         :return: asymmetry coefficient
@@ -225,6 +239,7 @@ class Trajectory(object):
 
         eigen_values = np.linalg.eigvals(gyration_radius)
 
+        # this formula is specific for a two dimensional system
         asymmetry = - np.log(1. - np.power(eigen_values[0] - eigen_values[1], 2) /
                              (2. * np.power(eigen_values[0] + eigen_values[1], 2)))
 
@@ -233,7 +248,10 @@ class Trajectory(object):
     @staticmethod
     def straightness_(trajectory):
         """
-            estimates how much straight is the trajectory
+        Estimates how much straight is the trajectory
+        .. math::
+            S = \\frac{|\\mathbf{x}_{N-1} -\\mathbf{x}_0 |}{ \\sum_{i=1}{N-1} |\\mathbf{x}_i - \\mathbf{x}_{i-1}|}
+
         :return straightness: measure of linearity
         """
         summation = 0.
@@ -249,8 +267,11 @@ class Trajectory(object):
     @staticmethod
     def kurtosis_(trajectory):
         """
-            calculates the kurtosis of the trajectory projecting the positions
-            along the principal axis calculated with the gyration radius
+        Calculates the kurtosis of the trajectory projecting the positions
+        along the principal axis calculated with the gyration radius
+        .. math::
+            K = \\frac{1}{N} \\sum_{i=1}^N \\frac{x_i^p - \\bar{x}_i^p }{ \\sigma_{x^p}^4}
+
         :return kurtosis:
         """
 
@@ -261,7 +282,9 @@ class Trajectory(object):
     @staticmethod
     def gaussianity_(trajectory):
         """
-            measure of how close to a gaussian distribution is the trajectory
+        measure of how close to a gaussian distribution is the trajectory.
+        .. math::
+            g(n) = \\frac{ \\langle r_n^4 \\rangle }{2 \\langle r_n^2 \\rangle^2}
         :return gaussianity: measure of similarity to a gaussian function
         """
         fourth_order = moment_(trajectory, 4)
