@@ -73,8 +73,8 @@ class Trajectory(object):
         """
             compute every feature for the trajectory saved in self._r
         """
-        # self.msd_ta = self.time_averaged_msd(self._r)
-        self.msd_ea = self.ensemble_averaged_msd(self._r,
+        # self.msd_ta = self.msd_time_averaged(self._r)
+        self.msd_ea = self.msd_ensemble_averaged(self._r,
                                                  np.arange(len(self._r)))
         self.anomalous_exponent = self.anomalous_exponent_(self.msd_ea, self._t)
         self.fractal_dimension = self.fractal_dimension_(self._r)
@@ -95,7 +95,7 @@ class Trajectory(object):
         return features
 
     @staticmethod
-    def ensemble_averaged_msd(trajectory, tau):
+    def msd_ensemble_averaged(trajectory, tau):
         """
         calculates the ensemble-averaged mean squared displacement
         
@@ -127,7 +127,7 @@ class Trajectory(object):
         return msd
 
     @staticmethod
-    def time_averaged_msd(trajectory):
+    def msd_time_averaged(trajectory):
         """
         calculates the time-averaged mean squared displacement
         
@@ -146,8 +146,10 @@ class Trajectory(object):
     def anomalous_exponent_(msd, timelag):
         """
         Calculates the diffusion anomalous exponent
+
         .. math::
-            \\alpha = \\frac{ \ln{\\left( \\langle x^2 \\rangle   \\right)} }{ \ln{(t)} }
+            \\alpha = \\frac{ \log{\\left( \\langle x^2 \\rangle   \\right)} }{ \log{(t)} }
+
         :param msd: mean square displacement
         :param timelag: time interval
         :return: diffusion nomalous exponent
@@ -228,10 +230,9 @@ class Trajectory(object):
         then use the eigenvalues to estimate the asymmetry between axis
 
         .. math::
-            a = - \\log \\left(1 - \\frac{ ( \\lambda_1 - \\lambda_2)^2}{2 ( \\lambda_1 + \\lambda_2)^2} \\right)
+            a = - \\log{ \\left(1 - \\frac{ ( \\lambda_1 - \\lambda_2)^2}{2 ( \\lambda_1 + \\lambda_2)^2} \\right)}
 
-        TODO: this function is specific to 2-dimensional systems,
-            it should be generalized in next versions.
+        TODO: generalize for 1D and 3D.
 
         :param gyration_radius: gyration radius tensor
         :return: asymmetry coefficient
@@ -283,8 +284,10 @@ class Trajectory(object):
     def gaussianity_(trajectory):
         """
         measure of how close to a gaussian distribution is the trajectory.
+
         .. math::
             g(n) = \\frac{ \\langle r_n^4 \\rangle }{2 \\langle r_n^2 \\rangle^2}
+
         :return gaussianity: measure of similarity to a gaussian function
         """
         fourth_order = moment_(trajectory, 4)
@@ -297,7 +300,12 @@ class Trajectory(object):
     @staticmethod
     def msd_ratio_(trajectory):
         """
-            ratio of mean squared displacements
+        ratio of mean squared displacements
+
+        .. math::
+            \\langle r^2 \\rangle_{n_1, n_2} = \\frac{\\langle r^2 \\rangle_{n_1 }}
+            {\\langle r^2 \\rangle_{n_2 }} - \\frac{n_1}{n_2}
+
         :return msd_ratio:
         """
         msd_ratio = np.mean(trajectory)  # placeHolder
@@ -306,9 +314,13 @@ class Trajectory(object):
     @staticmethod
     def trappedness_(diffusion_constant, r0):
         """
-            estimate the trappedness probability
-        :param diffusion_constant:
-        :param r0:
+        Estimates the trappedness probability:
+
+        .. math::
+        p_t = 1 - \\exp{ \\left( 0.2048  - 0.25117 \\left( \\frac{Dt}{r_0^2} \\right) \\right)}
+
+        :param diffusion_constant: short-time diffusion coefficient estimated by the first two time lags
+        :param r0: radius of the bounded region
         :return:
         """
         trappedness = 1 - np.exp(0.2080 - 0.25117 * (diffusion_constant / np.power(r0, 2)))
