@@ -155,7 +155,7 @@ class Trajectory(object):
         Calculates the diffusion anomalous exponent
 
         .. math::
-            \\alpha = \\frac{ \log{ \\left( \\partial \\langle x^2 \\rangle   \\right)} }{ \\partial (\log{(t)}) }
+            \\alpha = \\frac{  \\partial \log{ \\left( \\langle x^2 \\rangle   \\right)} }{ \\partial (\log{(t)}) }
 
         :param msd: mean square displacement
         :param time_lag: time interval
