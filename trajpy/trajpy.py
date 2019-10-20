@@ -139,7 +139,7 @@ class Trajectory(object):
         calculates the time-averaged mean squared displacement
         
         .. math::
-            \\langle \\mathbf{r}^2 \\rangle (t) = \\{1}{N-1} \\sum_{n=1}^N |\\mathbf{x}_{n}-\\mathbf{x}_0|^2
+            \\langle \\mathbf{r}^2 \\rangle (t) = \\{1}^{N-1} \\sum_{n=1}^N |\\mathbf{x}_{n}-\\mathbf{x}_0|^2
         :return msd: time-averaged msd
         """
         msd = np.zeros(len(trajectory))
