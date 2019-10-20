@@ -336,8 +336,8 @@ class Trajectory(object):
         the straightness.
 
         .. math::
-            E = \\frac{| \\mathbf{x}_{N-1} - \\mathbf{x}_{0}  |^2  }
-            { (N-1) \\sum_{i=1}{N-1} |\\mathbf{x}_{i} - \\mathbf{x}_{i-1}|^2 }^
+            E = \\frac{|\\mathbf{x}_{N-1} - \\mathbf{x}_{0}|^2  }
+            { (N-1) \\sum_{i=1}{N-1} |\\mathbf{x}_{i} - \\mathbf{x}_{i-1}|^2 }
 
         :return efficiency: trajectory efficiency.
         """
