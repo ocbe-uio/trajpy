@@ -253,7 +253,7 @@ class Trajectory(object):
 
         .. math::
             S = \\frac{|\\mathbf{x}_{N-1} -\\mathbf{x}_0 |}
-            { \\sum_{i=1}{N-1} |\\mathbf{x}_i - \\mathbf{x}_{i-1}|}
+            { \\sum_{i=1}^{N-1} |\\mathbf{x}_i - \\mathbf{x}_{i-1}|}
 
         :return straightness: measure of linearity
         """
@@ -332,8 +332,14 @@ class Trajectory(object):
     @staticmethod
     def efficiency_(trajectory):
         """
-            calculates the efficiency of the movement
-        :return efficiency:
+        Calculates the efficiency of the movement, a measure that is related to
+        the straightness.
+
+        .. math::
+            E = \\frac{| \\mathbf{x}_{N-1} - \\mathbf{x}_{0}  |^2  }
+            { (N-1) \\sum_{i=1}{N-1} |\\mathbf{x}_{i} - \\mathbf{x}_{i-1}|^2 }^
+
+        :return efficiency: trajectory efficiency.
         """
         den = 0.
 
