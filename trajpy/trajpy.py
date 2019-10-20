@@ -270,6 +270,7 @@ class Trajectory(object):
         """
         Calculates the kurtosis of the trajectory projecting the positions
         along the principal axis calculated with the gyration radius
+
         .. math::
             K = \\frac{1}{N} \\sum_{i=1}^N \\frac{x_i^p - \\bar{x}_i^p }{ \\sigma_{x^p}^4}
 
