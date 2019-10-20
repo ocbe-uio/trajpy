@@ -239,8 +239,6 @@ class Trajectory(object):
         .. math::
             a = - \\log{ \\left(1 - \\frac{ ( \\lambda_1 - \\lambda_2)^2}{2 ( \\lambda_1 + \\lambda_2)^2} \\right)}
 
-        TODO: generalize for 1D and 3D.
-
         :param gyration_radius: gyration radius tensor
         :return: asymmetry coefficient
         """
@@ -283,9 +281,7 @@ class Trajectory(object):
         .. math::
             K = \\frac{1}{N} \\sum_{i=1}^N \\frac{x_i^p - \\bar{x}_i^p }{ \\sigma_{x^p}^4}
 
-        TODO: implement this calculation. Use np.linalg.eig to calculate the eigenvectors.
-
-        :return kurtosis:
+        :return kurtosis: K
         """
 
         kurtosis = np.mean(trajectory)  # placeholder

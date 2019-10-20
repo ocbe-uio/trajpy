@@ -23,7 +23,7 @@ class TestTrajectoryGenerator(unittest.TestCase):
 
         r = tj.Trajectory()
 
-        fractal_dimension = r.fractal_dimension_(trajectory)
+        fractal_dimension, d_max = r.fractal_dimension_(trajectory)
 
         self.assertAlmostEqual(fractal_dimension, 3.08, places=1)
 

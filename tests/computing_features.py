@@ -35,8 +35,8 @@ class TestFeatures(unittest.TestCase):
 
         r = tj.Trajectory()
 
-        self.assertAlmostEqual(r.fractal_dimension_(x1), 1.0, places=2)
-        self.assertGreaterEqual(r.fractal_dimension_(x2), 3.0)
+        self.assertAlmostEqual(r.fractal_dimension_(x1)[0], 1.0, places=2)
+        self.assertGreaterEqual(r.fractal_dimension_(x2)[0], 3.0)
 
     def test_gyration_radius_and_asymmetry(self):
         """
