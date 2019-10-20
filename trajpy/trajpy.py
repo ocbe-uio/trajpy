@@ -13,7 +13,7 @@ def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
     :param l_size: box size
     :param periodic: boundary conditions
     :param order: momentum order
-    :return:
+    :return moment: n-th moment
     """
 
     moment = np.zeros(trajectory.shape)
