@@ -91,7 +91,7 @@ class Trajectory(object):
         self.gaussianity = self.gaussianity_(self._r)
         # self.msd_ratio = self.msd_ratio_(self._r)
         self.efficiency = self.efficiency_(self._r)
-        self.trappedness = self.trappedness_(self.diffusivity, self._r0)
+        # self.trappedness = self.trappedness_(self.diffusivity, self._r0)
 
         features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
                     str(np.round(self.fractal_dimension, 4)) + ',' +
