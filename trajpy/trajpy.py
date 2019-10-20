@@ -7,7 +7,7 @@ def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
     Calculates the n-th statistical moment of the trajectory r.
 
     .. math::
-        \\langle \\mathbf{r}n \\rangle = \\frac{1}{N-1} \\sum_{n=1}^{N-1} |\\mathbf{x}_{n+1} - \\mathbf{x}_n |^n
+        \\langle \\mathbf{r}_n \\rangle = \\frac{1}{N-1} \\sum_{n=1}^{N-1} |\\mathbf{x}_{n+1} - \\mathbf{x}_n |^n
 
     :param trajectory: trajectory
     :param l_size: box size
