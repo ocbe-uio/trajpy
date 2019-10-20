@@ -7,7 +7,7 @@ def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
     Calculates the n-th statistical moment of the trajectory r.
 
     .. math::
-        \\langle \\mathbf{r}^n \\rangle = \\frac{1}{N-1} \\sum_{n=1}^{N-1} |\\mathbf{x}_{n+1} - \\mathbf{x}_n |^n
+        \\langle \\mathbf{r}n \\rangle = \\frac{1}{N-1} \\sum_{n=1}^{N-1} |\\mathbf{x}_{n+1} - \\mathbf{x}_n |^n
 
     :param trajectory: trajectory
     :param l_size: box size
@@ -60,8 +60,8 @@ class Trajectory(object):
         else:
             raise TypeError('trajectory receives an array or a filename as input.')
 
-        self.msd_ta = None
-        self.msd_ea = None
+        self.msd_ta = None  # time-averaged mean squared displacement
+        self.msd_ea = None  # ensemble-averaged mean squared displacement
         self.anomalous_exponent = None
         self.fractal_dimension = None
         self.gyration_radius = None
@@ -71,6 +71,9 @@ class Trajectory(object):
         self.gaussianity = None
         self.msd_ratio = None
         self.efficiency = None
+        self.trappedness = None
+        self.diffusivity = None
+        self._r0 = None  # maximum distance between any two points of the trajectory
 
     def compute_features(self):
         """
@@ -80,7 +83,7 @@ class Trajectory(object):
         self.msd_ea = self.msd_ensemble_averaged(self._r,
                                                  np.arange(len(self._r)))
         self.anomalous_exponent = self.anomalous_exponent_(self.msd_ea, self._t)
-        self.fractal_dimension = self.fractal_dimension_(self._r)
+        self.fractal_dimension, self._r0, = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
         self.asymmetry = self.asymmetry_(self.gyration_radius)
         self.straightness = self.straightness_(self._r)
@@ -88,6 +91,7 @@ class Trajectory(object):
         self.gaussianity = self.gaussianity_(self._r)
         # self.msd_ratio = self.msd_ratio_(self._r)
         self.efficiency = self.efficiency_(self._r)
+        self.trappedness = self.trappedness_(self.diffusivity, self._r0)
 
         features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
                     str(np.round(self.fractal_dimension, 4)) + ',' +
@@ -135,7 +139,7 @@ class Trajectory(object):
         calculates the time-averaged mean squared displacement
         
         .. math::
-            \\langle \\mathbf{r}_n^2 \\rangle (t) = \\sum_n^N |\\mathbf{x}_{n}-\\mathbf{x}_0|^2
+            \\langle \\mathbf{r}^2 \\rangle (t) = \\{1}{N-1} \\sum_{n=1}^N |\\mathbf{x}_{n}-\\mathbf{x}_0|^2
         :return msd: time-averaged msd
         """
         msd = np.zeros(len(trajectory))
@@ -146,20 +150,20 @@ class Trajectory(object):
         return msd
 
     @staticmethod
-    def anomalous_exponent_(msd, timelag):
+    def anomalous_exponent_(msd, time_lag):
         """
         Calculates the diffusion anomalous exponent
 
         .. math::
-            \\alpha = \\frac{ \log{\\left( \\langle x^2 \\rangle   \\right)} }{ \log{(t)} }
+            \\alpha = \\frac{ \log{ \\left( \\partial \\langle x^2 \\rangle   \\right)} }{ \\partial (\log{(t)}) }
 
         :param msd: mean square displacement
-        :param timelag: time interval
+        :param time_lag: time interval
         :return: diffusion nomalous exponent
         """
 
         msd_log = np.log(msd[1:])
-        time_log = np.log(timelag[1:])
+        time_log = np.log(time_lag[1:])
 
         x, y = time_log, msd_log
         x = x.reshape(-1, 1)
@@ -203,7 +207,7 @@ class Trajectory(object):
         fractal_dimension = np.round(np.log(n_points) / (np.log(n_points)
                                      + np.log(d_max * np.power(length, -1))), decimals=2)
 
-        return fractal_dimension
+        return fractal_dimension, d_max
 
     @staticmethod
     def gyration_radius_(trajectory):
@@ -279,6 +283,8 @@ class Trajectory(object):
         .. math::
             K = \\frac{1}{N} \\sum_{i=1}^N \\frac{x_i^p - \\bar{x}_i^p }{ \\sigma_{x^p}^4}
 
+        TODO: implement this calculation. Use np.linalg.eig to calculate the eigenvectors.
+
         :return kurtosis:
         """
 
@@ -326,10 +332,11 @@ class Trajectory(object):
             p_t = 1 - \\exp{ \\left( 0.2048 - 0.25117 \\left( \\frac{Dt}{r_0^2} \\right) \\right) }
 
         :param diffusion_constant: short-time diffusion coefficient estimated by the first two time lags
-        :param r0: radius of the bounded region
+        :param r0: characteristic radius, defined by half the maximum distance between any two points
         :return:
         """
         trappedness = 1 - np.exp(0.2080 - 0.25117 * (diffusion_constant / np.power(r0, 2)))
+
         return trappedness
 
     @staticmethod
