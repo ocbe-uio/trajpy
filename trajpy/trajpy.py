@@ -252,7 +252,8 @@ class Trajectory(object):
         Estimates how much straight is the trajectory
 
         .. math::
-            S = \\frac{|\\mathbf{x}_{N-1} -\\mathbf{x}_0 |}{ \\sum_{i=1}{N-1} |\\mathbf{x}_i - \\mathbf{x}_{i-1}|}
+            S = \\frac{|\\mathbf{x}_{N-1} -\\mathbf{x}_0 |}
+            { \\sum_{i=1}{N-1} |\\mathbf{x}_i - \\mathbf{x}_{i-1}|}
 
         :return straightness: measure of linearity
         """
@@ -319,7 +320,7 @@ class Trajectory(object):
         Estimates the trappedness probability:
 
         .. math::
-        p_t = 1 - \\exp{ \\left( 0.2048  - 0.25117 \\left( \\frac{Dt}{r_0^2} \\right) \\right)}
+            p_t = 1 - \\exp{ \\left( 0.2048 - 0.25117 \\left( \\frac{Dt}{r_0^2} \\right) \\right) }
 
         :param diffusion_constant: short-time diffusion coefficient estimated by the first two time lags
         :param r0: radius of the bounded region
