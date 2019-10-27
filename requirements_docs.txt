@@ -1,5 +1,5 @@
 -r requirements.txt
-sphinx==2.2.0
+sphinx==2.2.1
 nbsphinx==0.4.3
-IPython==7.8.0
+IPython==7.9.0
 ipykernel==5.1.3
