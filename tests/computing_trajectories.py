@@ -64,7 +64,7 @@ class TestTrajectoryGenerator(unittest.TestCase):
         
         self.assertAlmostEqual(np.around(fractal_dimension, decimals=0), 3.0, places=1)
         
-     def test_superdiffusion(self):
+    def test_superdiffusion(self):
         """
         Test if the generator of superdiffusion trajectories is working properly
         by measuring the fractal dimension.
