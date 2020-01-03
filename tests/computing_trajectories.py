@@ -15,11 +15,11 @@ class TestTrajectoryGenerator(unittest.TestCase):
         Test if the generator of anomalous trajectories is working properly
         by measuring the fractal dimension.
         """
-        tsteps = 250
-        nsample = 1
+        n_steps = 250
+        n_samples = 1
         dt = 1.
 
-        xa, trajectory = tjg.anomalous_diffusion(tsteps, nsample, dt, alpha=1.0)
+        xa, trajectory = tjg.anomalous_diffusion(n_steps, n_samples, dt, alpha=1.0)
 
         r = tj.Trajectory()
 
@@ -32,8 +32,8 @@ class TestTrajectoryGenerator(unittest.TestCase):
         Test if the generator of normal diffusion trajectories is working properly
         by measuring the fractal dimension.
         """
-        tsteps = 250
-        nsample = 1
+        n_steps = 250
+        n_samples = 1
         dt = 0.1
         
         xa, trajectory = tjg.normal_diffusion(n_steps, n_samples, 1.0, 0., 100, dt)
