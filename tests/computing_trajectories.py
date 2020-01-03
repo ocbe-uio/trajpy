@@ -12,8 +12,8 @@ class TestTrajectoryGenerator(unittest.TestCase):
 
     def test_anomalous_trajectory(self):
         """
-            test if the generator of anomalous trajectories is working properly
-            by measuring the fractal dimension
+        Test if the generator of anomalous trajectories is working properly
+        by measuring the fractal dimension.
         """
         tsteps = 250
         nsample = 1
@@ -27,6 +27,23 @@ class TestTrajectoryGenerator(unittest.TestCase):
 
         self.assertAlmostEqual(fractal_dimension, 3.08, places=1)
 
+    def test_normal_diffusion(self):
+        """
+        Test if the generator of normal diffusion trajectories is working properly
+        by measuring the fractal dimension.
+        """
+        tsteps = 250
+        nsample = 1
+        dt = 0.1
+        
+        xa, trajectory = tjg.normal_diffusion(n_steps, n_samples, 1.0, 0., 100, dt)
+        
+        r = tj.Trajectory()
+        
+        fractal_dimension, d_max = r.fractal_dimension(trajectory)
+        
+        self.assertAlmostEqual( np.around(fractal_dimension, decimals=0), 2.0, places=1)
+        
 
 if __name__ == '__main__':
     unittest.main()
