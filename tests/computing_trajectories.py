@@ -40,7 +40,7 @@ class TestTrajectoryGenerator(unittest.TestCase):
         
         r = tj.Trajectory()
         
-        fractal_dimension, d_max = r.fractal_dimension(trajectory)
+        fractal_dimension, d_max = r.fractal_dimension_(trajectory)
         
         self.assertAlmostEqual( np.around(fractal_dimension, decimals=0), 2.0, places=1)
         
