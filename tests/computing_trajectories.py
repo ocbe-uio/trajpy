@@ -25,7 +25,7 @@ class TestTrajectoryGenerator(unittest.TestCase):
 
         fractal_dimension, d_max = r.fractal_dimension_(trajectory)
 
-        self.assertAlmostEqual(fractal_dimension, 3.0, places=1)
+        self.assertAlmostEqual(fractal_dimension, 3.08, places=1)
 
     def test_normal_diffusion(self):
         """
