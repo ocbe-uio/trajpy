@@ -1,3 +1,10 @@
+checks:
+  argument-count:
+    config:
+      threshold: 8
+
 plugins:
   pep8:
     enabled: true
+
+  
