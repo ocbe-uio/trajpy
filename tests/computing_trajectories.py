@@ -54,7 +54,7 @@ class TestTrajectoryGenerator(unittest.TestCase):
         n_samples = 1
         dt = 0.1
         D = 100.0
-        radius = 10.
+        radius = 5.
         
         xa, trajectory = tjg.confined_diffusion(radius, n_steps, n_samples, 1.0, 0., D, dt)
         
