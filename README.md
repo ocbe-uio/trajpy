@@ -9,26 +9,29 @@
 
 
 # TrajPy
-Pythonic package for trajectory classification.
+Pythonic package for trajectory classification in 3D.
 
 
 ## Features
 - Ensemble-averaged MSD
 - Time-averaged MSD
+- MSD Ratio
 - Anomalous Exponent
 - Fractal dimension
 - Gyration radius
+- Anisotropy
+- Kurtosis
 - Straightness
 - Efficiency
 - Gaussianity
-- Asymmetry
-
-
-##### Implementing the following features:
 - Trappedness
-- MSD ratio
-- Kurtosis
+- Asymmetry (2D only)
 
+## Trajectory generator
+- Normal Diffusion
+- Direct Motion
+- Anomalous Diffusion
+- Confined Diffusion
 
 ## Requirements
 - numpy >= 1.14.3
