@@ -92,7 +92,7 @@ class Trajectory(object):
         self.fractal_dimension, self._r0, = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
         self.eigenvalues = np.linalg.eigvals(self.gyration_radius)
-        self.anisotropy = self.anysotropy_(self.eigenvalues)
+        self.anisotropy = self.anisotropy_(self.eigenvalues)
         self.kurtosis = self.kurtosis_(self.eigenvalues)
         self.straightness = self.straightness_(self._r)
         self.gaussianity = self.gaussianity_(self._r)
@@ -276,7 +276,7 @@ class Trajectory(object):
         return asymmetry
 
     @staticmethod
-    def anysotropy_(eigenvalues):
+    def anisotropy_(eigenvalues):
         """
         Calculates the trajectory anisotropy using the eigenvalues of the gyration radius tensor.
 
@@ -287,7 +287,7 @@ class Trajectory(object):
 
         anisotropy = 1. - 3. * ((eigenvalues[0] * eigenvalues[1]
                                 + eigenvalues[1] * eigenvalues[2]
-                                + eigenvalues[3] * eigenvalues[0])
+                                + eigenvalues[2] * eigenvalues[0])
                                 / np.power(np.sum(eigenvalues[:]), 2))
 
         return anisotropy
