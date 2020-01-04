@@ -65,7 +65,7 @@ class TestFeatures(unittest.TestCase):
 
         self.assertAlmostEqual(asymmetry_oscillatory, 0.60, places=1)
         self.assertAlmostEqual(asymmetry_circle, 0.0, places=1)
-        self.assertEqual(np.round(gyration_radius, 2).all(), np.round(circle_gyr, 2).all())
+        self.assertEqual(np.round(gyration_radius_circle, 2).all(), np.round(circle_gyr, 2).all())
 
 
     def test_straightness(self):
