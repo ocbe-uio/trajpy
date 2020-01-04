@@ -61,7 +61,7 @@ class TestFeatures(unittest.TestCase):
         eigenvalues_circle = np.linalg.eigvals(gyration_radius_circle)
         eigenvalues_osci = np.linalg.eigvals(gyration_radius_osci)
         asymmetry_oscillatory = r.asymmetry_(eigenvalues_osci)
-        asymmetry_circle = r.asymmetry_(eigenvalues_circlefe)
+        asymmetry_circle = r.asymmetry_(eigenvalues_circle)
 
         self.assertAlmostEqual(asymmetry_oscillatory, 0.60, places=1)
         self.assertAlmostEqual(asymmetry_circle, 0.0, places=1)
