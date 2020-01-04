@@ -56,10 +56,12 @@ class TestFeatures(unittest.TestCase):
             circle[n] = radius * np.array([np.cos(np.pi * n/10), np.sin(np.pi * n/10)])
 
         r = tj.Trajectory()
-        gyration_radius = r.gyration_radius_(circle)
-
-        asymmetry_oscillatory = r.asymmetry_(r.gyration_radius_(x1x2))
-        asymmetry_circle = r.asymmetry_(gyration_radius)
+        gyration_radius_circle = r.gyration_radius_(circle)
+        gyration_radius_osci = r.gyration_radius_(x1x2)
+        eigenvalues_circle = np.linalg.eigvals(gyration_radius_circle)
+        eigenvalues_osci = np.linalg.eigvals(gyration_radius_osci)
+        asymmetry_oscillatory = r.asymmetry_(eigenvalues_osci)
+        asymmetry_circle = r.asymmetry_(eigenvalues_circlefe)
 
         self.assertAlmostEqual(asymmetry_oscillatory, 0.60, places=1)
         self.assertAlmostEqual(asymmetry_circle, 0.0, places=1)
