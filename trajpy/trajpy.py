@@ -62,11 +62,14 @@ class Trajectory(object):
 
         self.msd_ta = None  # time-averaged mean squared displacement
         self.msd_ea = None  # ensemble-averaged mean squared displacement
+        self.msd_ratio = None
         self.anomalous_exponent = None
         self.fractal_dimension = None
+        self.eigenvalues = None
         self.gyration_radius = None
         self.asymmetry = None
         self.straightness = None
+        self.anisotropy = None
         self.kurtosis = None
         self.gaussianity = None
         self.msd_ratio = None
@@ -77,28 +80,34 @@ class Trajectory(object):
 
     def compute_features(self):
         """
-            compute every feature for the trajectory saved in self._r
+        Compute every feature for the trajectory saved in self._r.
+
+        :return features: return the values of the features as a string.
         """
         # self.msd_ta = self.msd_time_averaged(self._r)
         self.msd_ea = self.msd_ensemble_averaged(self._r,
                                                  np.arange(len(self._r)))
+        self.msd_ratio = self.msd_ratio_(self.msd_ea, n1=2, n2=10)
         self.anomalous_exponent = self.anomalous_exponent_(self.msd_ea, self._t)
         self.fractal_dimension, self._r0, = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
-        self.asymmetry = self.asymmetry_(self.gyration_radius)
+        self.eigenvalues = np.linalg.eigvals(self.gyration_radius)
+        self.anisotropy = self.anysotropy_(self.eigenvalues)
+        self.kurtosis = self.kurtosis_(self.eigenvalues)
         self.straightness = self.straightness_(self._r)
-        # self.kurtosis = self.kurtosis_(self._r)
         self.gaussianity = self.gaussianity_(self._r)
-        # self.msd_ratio = self.msd_ratio_(self._r)
         self.efficiency = self.efficiency_(self._r)
-        # self.trappedness = self.trappedness_(self.diffusivity, self._r0)
+        # self.trappedness = self.trappedness_(self.diffusivity, self._r0, t)
 
         features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
+                    str(np.round(self.msd_ratio, 4)) + ',' +
                     str(np.round(self.fractal_dimension, 4)) + ',' +
-                    str(np.round(self.asymmetry, 4)) + ',' +
+                    str(np.round(self.anisotropy, 4)) + ',' +
+                    str(np.round(self.kurtosis, 4)) + ',' +
                     str(np.round(self.straightness, 4)) + ',' +
                     str(np.round(self.gaussianity, 4)) + ',' +
                     str(np.round(self.efficiency, 4)))
+
         return features
 
     @staticmethod
@@ -150,12 +159,27 @@ class Trajectory(object):
         return msd
 
     @staticmethod
+    def msd_ratio_(msd_ea, n1, n2):
+        """
+        ratio of the ensemble averaged mean squared displacements
+
+        .. math::
+            \\langle r^2 \\rangle_{n_1, n_2} = \\frac{\\langle r^2 \\rangle_{n_1 }}
+            {\\langle r^2 \\rangle_{n_2 }} - \\frac{n_1}{n_2}
+
+        :return msd_ratio:
+        """
+
+        msd_ratio = msd_ea[n1]/msd_ea[n2] - n2/n1
+        return msd_ratio
+
+    @staticmethod
     def anomalous_exponent_(msd, time_lag):
         """
         Calculates the diffusion anomalous exponent
 
         .. math::
-            \\alpha = \\frac{  \\partial \log{ \\left( \\langle x^2 \\rangle   \\right)} }{ \\partial (\log{(t)}) }
+            \\alpha = \\frac{  \\partial \\log{ \\left( \\langle x^2 \\rangle   \\right)} }{ \\partial (\\log{(t)}) }
 
         :param msd: mean square displacement
         :param time_lag: time interval
@@ -231,25 +255,42 @@ class Trajectory(object):
         return gyration_radius
 
     @staticmethod
-    def asymmetry_(gyration_radius):
+    def asymmetry_(eigenvalues):
         """
-        Takes the gyration radius as input and calculates the eigenvalues
-        then use the eigenvalues to estimate the asymmetry between axis
+        Takes the eigenvalues of the gyration radius tensor 
+        to estimate the asymmetry between axis.
 
         .. math::
             a = - \\log{ \\left(1 - \\frac{ ( \\lambda_1 - \\lambda_2)^2}{2 ( \\lambda_1 + \\lambda_2)^2} \\right)}
 
-        :param gyration_radius: gyration radius tensor
+        :param eigenvalues: eigenvalues of the gyration radius tensor
         :return: asymmetry coefficient
         """
 
-        eigen_values = np.linalg.eigvals(gyration_radius)
-
-        # this formula is specific for a two dimensional system
-        asymmetry = - np.log(1. - np.power(eigen_values[0] - eigen_values[1], 2) /
-                             (2. * np.power(eigen_values[0] + eigen_values[1], 2)))
+        if len(eigenvalues) == 2:
+            asymmetry = - np.log(1. - np.power(eigenvalues[0] - eigenvalues[1], 2) /
+                                 (2. * np.power(eigenvalues[0] + eigenvalues[1], 2)))
+        else:
+            raise IndexError("This function is meant for 2D trajectories only.")
 
         return asymmetry
+
+    @staticmethod
+    def anysotropy_(eigenvalues):
+        """
+        Calculates the trajectory anisotropy using the eigenvalues of the gyration radius tensor.
+
+        .. math::
+            a^2 = 1 - 3 \\frac{\\lambda_x\\lambda_y + \\lambda_y \\lambda_z + \\lambda_z\\lambda_x }{(\\lambda_x+\\lambda_y+\\lambda_z)^2}
+
+        """
+
+        anisotropy = 1. - 3. * ((eigenvalues[0] * eigenvalues[1]
+                                + eigenvalues[1] * eigenvalues[2]
+                                + eigenvalues[3] * eigenvalues[0])
+                                / np.power(np.sum(eigenvalues[:]), 2))
+
+        return anisotropy
 
     @staticmethod
     def straightness_(trajectory):
@@ -273,18 +314,17 @@ class Trajectory(object):
         return straightness
 
     @staticmethod
-    def kurtosis_(trajectory):
+    def kurtosis_(eigenvalues):
         """
-        Calculates the kurtosis of the trajectory projecting the positions
-        along the principal axis calculated with the gyration radius
+        Calculates the kurtosis  using the eigenvalues of the gyration radius with the following expression:
 
         .. math::
-            K = \\frac{1}{N} \\sum_{i=1}^N \\frac{x_i^p - \\bar{x}_i^p }{ \\sigma_{x^p}^4}
+            \\kappa^2 = \\frac{3}{2}  \\frac{\\lambda_x^4 + \\lambda_y^4 + \\lambda_z^4 }{ \\left( \\lambda_x^2 + \\lambda_y^2 + \\lambda_z^2 \\right)^2 } - \\frac{1}{2}
 
         :return kurtosis: K
         """
-
-        kurtosis = np.mean(trajectory)  # placeholder
+        kurtosis = (3.0 / 2.0) * (np.sum(np.power(eigenvalues[:], 4)) /
+                                  np.sum(np.power(eigenvalues[:], 2))**2) - 1.0 / 2.0
 
         return kurtosis
 
@@ -306,21 +346,7 @@ class Trajectory(object):
         return gaussianity
 
     @staticmethod
-    def msd_ratio_(trajectory):
-        """
-        ratio of mean squared displacements
-
-        .. math::
-            \\langle r^2 \\rangle_{n_1, n_2} = \\frac{\\langle r^2 \\rangle_{n_1 }}
-            {\\langle r^2 \\rangle_{n_2 }} - \\frac{n_1}{n_2}
-
-        :return msd_ratio:
-        """
-        msd_ratio = np.mean(trajectory)  # placeHolder
-        return msd_ratio
-
-    @staticmethod
-    def trappedness_(diffusion_constant, r0):
+    def trappedness_(diffusion_constant, r0, t):
         """
         Estimates the trappedness probability:
 
@@ -329,9 +355,10 @@ class Trajectory(object):
 
         :param diffusion_constant: short-time diffusion coefficient estimated by the first two time lags
         :param r0: characteristic radius, defined by half the maximum distance between any two points
+        :param t: period of time
         :return:
         """
-        trappedness = 1 - np.exp(0.2080 - 0.25117 * (diffusion_constant / np.power(r0, 2)))
+        trappedness = 1 - np.exp(0.2080 - 0.25117 * ((diffusion_constant * t)/ np.power(r0, 2)))
 
         return trappedness
 
