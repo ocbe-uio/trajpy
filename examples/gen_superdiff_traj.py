@@ -1,7 +1,7 @@
 import trajpy.traj_generator as tjg
 import numpy as np
 """
-    generate N superdiffusion (direct motion) trajectories for each value of velocity
+    generates N superdiffusion (direct motion) trajectories for each value of velocity
 """
 
 n_steps = 250  # number of time steps
@@ -14,7 +14,4 @@ for value in velocity:
 
     xa, ya = tjg.superdiffusion(value, n_steps, n_samples, 0., dt)
 
-    for n in range(0, n_samples):
-        np.savetxt('data/superdiffusion/trj' + str(np.round(value, decimals=1)) + str(n) + '.csv', ya[:, n],
-                   delimiter=",", header='m')
-        print(np.round(value, decimals=2), n)
+    tjg.save_to_file(ya, value, 'data/superdiff')

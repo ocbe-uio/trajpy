@@ -30,7 +30,7 @@ def anomalous_diffusion(n_steps, n_samples, time_step, alpha):
     Generates an ensemble of anomalous trajectories.
 
     :param n_steps: total number of steps
-    :param n_sample: number of simulations
+    :param n_samples: number of simulations
     :param time_step: time step
     :param alpha: anomalous exponent
     :return x, y: time, array containing N_sample trajectories with Nsteps
@@ -50,6 +50,7 @@ def anomalous_diffusion(n_steps, n_samples, time_step, alpha):
 
     return x, y
 
+
 def normal_distribution(u, D, dt):
     """
     This is the steplength probability density function for normal diffusion.
@@ -57,20 +58,20 @@ def normal_distribution(u, D, dt):
     :param u: absolute distance travelled by the particle durint the time interval dt
     :param D: diffusivity
     :param dt: time interval
-    :return Fd: probability density function
+    :return pdf: probability density function
 
     """
     diff = 4. * D * dt
-    Fd = ((2. * u)/diff) * np.exp(-np.power(u, 2)/diff)
-    return Fd
+    pdf = ((2. * u) / diff) * np.exp(-np.power(u, 2) / diff)
+    return pdf
 
 
 def normal_diffusion(n_steps, n_samples, dx, y0, D, dt):
     """
     Generates an ensemble of normal diffusion trajectories.
 
-    :param tsteps: total steps
-    :param Nsample: number of trajectories
+    :param n_steps: total steps
+    :param n_samples: number of trajectories
     :param dx: maximum step length
     :param y0: starting position
     :param D: diffusivity
@@ -84,13 +85,14 @@ def normal_diffusion(n_steps, n_samples, dx, y0, D, dt):
     
     for i_sample in range(0, n_samples):
         i_step = 1
-        while(True):
+        while True:
             
-            if(i_step >= n_steps): break
+            if i_step >= n_steps:
+                break
             
             random_number = np.random.rand()
-            u = (0.5 -  random_number) * dx  # step length and direction
-            if  random_number >= normal_distribution(np.abs(u), D, dt):
+            u = (0.5 - random_number) * dx  # step length and direction
+            if random_number >= normal_distribution(np.abs(u), D, dt):
                 y[i_step, i_sample] = y[i_step-1, i_sample] + u
 
             i_step += 1       
@@ -112,7 +114,7 @@ def confined_diffusion(radius, n_steps, n_samples, dx, y0, D, dt):
     """
     y = np.zeros((n_steps, n_samples))
     x = np.linspace(0, n_steps, n_steps) 
-    y[0,:] = y0
+    y[0, :] = y0
     sub_step = 0.0
     for i_sample in range(0, n_samples):  
        
@@ -126,7 +128,6 @@ def confined_diffusion(radius, n_steps, n_samples, dx, y0, D, dt):
                 sub_step = sub_y[-1]
                 x[i_step] = t
 
-    
     return x, y
 
 
@@ -144,7 +145,7 @@ def superdiffusion(velocity, n_steps, n_samples, y0, dt):
     """
     y = np.zeros((n_steps, n_samples))
     x = np.linspace(0, n_steps, n_steps) 
-    y[0,:] = y0
+    y[0, :] = y0
     
     for i_sample in range(0,n_samples):  
        
@@ -153,3 +154,17 @@ def superdiffusion(velocity, n_steps, n_samples, y0, dt):
             x[i_step] = i_step * dt
             
     return x, y
+
+
+def save_to_file(y, param, path):
+    """
+    Saves the trajectories to a file.
+
+    :param y: trajectory array
+    :param param: a parameter that characterizes the kind of trajectory
+    :param path: path to the folder where the file will be saved
+    """
+
+    for n in range(0, len(y[:, 0])):
+        np.savetxt(path + '/traj' + str(np.round(param, decimals=1)) + str(n) + '.csv', y[:, n],
+                   delimiter=',', header='m')

@@ -14,6 +14,4 @@ for value in alphas:
 
     xa, ya = tjg.anomalous_diffusion(n_steps, n_samples, dt, alpha=value)
 
-    for i in range(0, n_samples):
-        np.savetxt('data/trj' + str(np.round(value, decimals=1)) + str(i) + '.csv', ya[:, i], delimiter=",", header='m')
-        print(np.round(value, decimals=2), i)
+    tjg.save_to_file(ya, value, 'data/anomalous')
