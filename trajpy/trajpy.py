@@ -74,7 +74,7 @@ class Trajectory(object):
         self.gaussianity = None
         self.msd_ratio = None
         self.efficiency = None
-        self.trappedness = None
+        self.confinement_probability = None
         self.diffusivity = None
         self._r0 = None  # maximum distance between any two points of the trajectory
 
@@ -84,12 +84,12 @@ class Trajectory(object):
 
         :return features: return the values of the features as a string.
         """
-        # self.msd_ta = self.msd_time_averaged(self._r)
+        self.msd_ta = self.msd_time_averaged(self._r)
         self.msd_ea = self.msd_ensemble_averaged(self._r,
                                                  np.arange(len(self._r)))
         self.msd_ratio = self.msd_ratio_(self.msd_ea, n1=2, n2=10)
-        self.anomalous_exponent = self.anomalous_exponent_(self.msd_ea, self._t)
-        self.fractal_dimension, self._r0, = self.fractal_dimension_(self._r)
+        self.anomalous_exponent = self.anomalous_exponent_(self.msd_ta, self._t)
+        self.fractal_dimension, self._r0 = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
         self.eigenvalues = np.linalg.eigvals(self.gyration_radius)
         self.anisotropy = self.anisotropy_(self.eigenvalues)
@@ -97,7 +97,8 @@ class Trajectory(object):
         self.straightness = self.straightness_(self._r)
         self.gaussianity = self.gaussianity_(self._r)
         self.efficiency = self.efficiency_(self._r)
-        # self.trappedness = self.trappedness_(self.diffusivity, self._r0, t)
+        self.diffusivity = self.anomalous_exponent_(self.msd_ea[:10], self._t[:10]) / 6.
+        self.confinement_probability = self.confinement_probability_(10, self.diffusivity, t[-1])
 
         features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
                     str(np.round(self.msd_ratio, 4)) + ',' +
@@ -106,6 +107,8 @@ class Trajectory(object):
                     str(np.round(self.kurtosis, 4)) + ',' +
                     str(np.round(self.straightness, 4)) + ',' +
                     str(np.round(self.gaussianity, 4)) + ',' +
+                    str(np.round(self.confinement_probability, 4)) + ',' +
+                    str(np.round(self.diffusivity, 4)) + ',' +
                     str(np.round(self.efficiency, 4)))
 
         return features
@@ -161,16 +164,19 @@ class Trajectory(object):
     @staticmethod
     def msd_ratio_(msd_ea, n1, n2):
         """
-        ratio of the ensemble averaged mean squared displacements
+        Ratio of the ensemble averaged mean squared displacements.
 
         .. math::
             \\langle r^2 \\rangle_{n_1, n_2} = \\frac{\\langle r^2 \\rangle_{n_1 }}
             {\\langle r^2 \\rangle_{n_2 }} - \\frac{n_1}{n_2}
 
+        with
+        .. math::
+            n_1 < n_2
         :return msd_ratio:
         """
 
-        msd_ratio = msd_ea[n1]/msd_ea[n2] - n2/n1
+        msd_ratio = msd_ea[n1]/msd_ea[n2] - n1/n2
         return msd_ratio
 
     @staticmethod
@@ -346,21 +352,42 @@ class Trajectory(object):
         return gaussianity
 
     @staticmethod
-    def trappedness_(diffusion_constant, r0, t):
+    def einstein_diffusion_probability_(r, D, t):
         """
-        Estimates the trappedness probability:
+        Calculates the probability of a Brownian particle with
+        diffusivity D arriving in the position r after a period of time t.
 
+        The normalized probability is given by
         .. math::
-            p_t = 1 - \\exp{ \\left( 0.2048 - 0.25117 \\left( \\frac{Dt}{r_0^2} \\right) \\right) }
+            p(r, t) = \\frac{1}{\\sqrt{ 4 \\pi D t}} \\exp{  \\left( \\frac{r^2}{4Dt} \\right)} \\right) \\, .
 
-        :param diffusion_constant: short-time diffusion coefficient estimated by the first two time lags
-        :param r0: characteristic radius, defined by half the maximum distance between any two points
-        :param t: period of time
-        :return:
+        :param r: position
+        :param D: diffusivity
+        :param t: time length
+        :return probability: probability of arriving in r.
         """
-        trappedness = 1 - np.exp(0.2080 - 0.25117 * ((diffusion_constant * t)/ np.power(r0, 2)))
+        A = 1. / np.power(4. * np.pi * D * t, 0.5)
+        prob = A * np.exp(-np.power(r, 2) / (4. * D * t))
+        return probability
 
-        return trappedness
+    @staticmethod
+    def confinement_probability_(r0, D, t):
+        """
+        Estimate the probability of Brownian particle with
+        diffusivity D being trapped in the interval [-r0, +r0] after a period of time t.
+        .. math::
+            P(r, D, t) = \\int_{-r_0}^{r_0} p(r, D, t) \\mathrm{d}r
+
+        :param r: position
+        :param D: diffusivity
+        :param t: time length
+        :return probability: probability of the particle being confined
+        """
+        x = np.zeros(2 * r0)
+        for N in range(-r0, r0):
+            x[r0 + N] = einstein_diffusion_probability_(N, D, t)
+        probability = np.sum(x)
+        return probability
 
     @staticmethod
     def efficiency_(trajectory):
