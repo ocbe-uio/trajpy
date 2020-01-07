@@ -339,7 +339,7 @@ class Trajectory(object):
         """
         x = np.zeros(2 * r0)
         for N in range(-r0, r0):
-            x[r0 + N] = einstein_diffusion_probability_(N, D, t)
+            x[r0 + N] = einstein_diffusion_probability(N, D, t)
         probability = np.sum(x)
         return probability
 
