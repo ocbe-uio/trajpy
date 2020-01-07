@@ -98,7 +98,7 @@ class Trajectory(object):
         self.gaussianity = self.gaussianity_(self._r)
         self.efficiency = self.efficiency_(self._r)
         self.diffusivity = self.anomalous_exponent_(self.msd_ea[:10], self._t[:10]) / 6.
-        self.confinement_probability = self.confinement_probability_(10, self.diffusivity, t[-1])
+        self.confinement_probability = self.confinement_probability_(10, self.diffusivity, self._t[-1])
 
         features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
                     str(np.round(self.msd_ratio, 4)) + ',' +
