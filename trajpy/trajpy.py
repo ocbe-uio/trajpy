@@ -1,5 +1,5 @@
 import numpy as np
-import auxiliar_functions as aux
+import trajpy.auxiliar_functions as aux
 from sklearn.linear_model import LinearRegression
 
 
