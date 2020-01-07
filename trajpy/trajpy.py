@@ -1,5 +1,5 @@
 import numpy as np
-from auxiliar_functions import moment_, einstein_diffusion_probability
+import auxiliar_functions as aux
 from sklearn.linear_model import LinearRegression
 
 
@@ -317,8 +317,8 @@ class Trajectory(object):
 
         :return gaussianity: measure of similarity to a gaussian function
         """
-        fourth_order = moment_(trajectory, 4)
-        second_order = moment_(trajectory, 2)
+        fourth_order = aux.moment_(trajectory, 4)
+        second_order = aux.moment_(trajectory, 2)
 
         gaussianity = (2/3) * (fourth_order/second_order) - 1
 
@@ -339,7 +339,7 @@ class Trajectory(object):
         """
         x = np.zeros(2 * r0)
         for N in range(-r0, r0):
-            x[r0 + N] = einstein_diffusion_probability(N, D, t)
+            x[r0 + N] = aux.einstein_diffusion_probability(N, D, t)
         probability = np.sum(x)
         return probability
 
