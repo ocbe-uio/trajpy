@@ -63,13 +63,13 @@ with open(trajectory+'.csv', 'w+', buffering=1) as f:
             
             for i in range(0, len(velocity)):
     
-                x1, y1 =  tjg.normal_diffusion(n_steps, n_samples, 1.0, 0., 100., dt)
+                x1, y1 =  tjg.normal_diffusion(n_steps, n_samples, 1.0, 0., 100., dt) + (0., ballistic_traj[:, i])
                 x2, y2 =  tjg.normal_diffusion(n_steps, n_samples, 1.0, 0., 100., dt)
                 x3, y3 =  tjg.normal_diffusion(n_steps, n_samples, 1.0, 0., 100., dt)
     
                 for n in range(0, n_samples):
                     r[:, 0] = x1[:]
-                    r[:, 1] = y1[:, n] + ballistic_traj[:, i]
+                    r[:, 1] = y1[:, n] 
                     r[:, 2] = y2[:, n] 
                     r[:, 3] = y3[:, n] 
                     traj = tj.Trajectory(r)
@@ -81,9 +81,9 @@ with open(trajectory+'.csv', 'w+', buffering=1) as f:
                         print('error computing features.')
         
     if 'anomalous' in trajectory:
-        diffusivity = np.array([1.4, 1.8, 2.0])
+        alpha = np.array([1.4, 1.8, 2.0])
     
-        for value in diffusivity:
+        for value in alpha:
             x1, y1 = tjg.anomalous_diffusion(n_steps, n_samples, dt, value)
             x2, y2 = tjg.anomalous_diffusion(n_steps, n_samples, dt, value)
             x3, y3 = tjg.anomalous_diffusion(n_steps, n_samples, dt, value)
