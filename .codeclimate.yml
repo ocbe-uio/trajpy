@@ -2,7 +2,9 @@ checks:
   argument-count:
     config:
       threshold: 8
-
+  complex-logic:
+    enabled: false
+    
 plugins:
   pep8:
     enabled: true
