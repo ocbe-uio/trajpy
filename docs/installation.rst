@@ -1,6 +1,11 @@
 Installation
 ============
-Clone the repository to your local directory ::
+
+We have the package hosted at PyPi, for installing use the command line: ::
+
+  pip3 install trajpy
+
+If you want to test the development version, clone the repository at your local directory ::
 
   git clone https://github.com/phydev/trajpy
 
@@ -8,10 +13,7 @@ from your terminal. Then run the setup.py for installing ::
 
   python setup.py --install
 
-We have the package hosted in test.pypi, after the first release we will migrate it to PyPi.
-But for now you can install it from there using the following command: ::
 
-  pip install -i https://test.pypi.org/simple/ trajpy
 
 
 Dependencies
