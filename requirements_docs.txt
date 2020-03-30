@@ -2,4 +2,4 @@
 sphinx==2.4.4
 nbsphinx==0.5.1
 IPython==7.13.0
-ipykernel==5.1.4
+ipykernel==5.2.0
