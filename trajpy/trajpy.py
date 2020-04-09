@@ -93,8 +93,10 @@ class Trajectory(object):
         
         .. math::
             \\langle \\mathbf{r}_n^2 \\rangle = \\frac{1}{N-n} \\sum_{i=1}^{N-n} |\\mathbf{x}_{i+n} - \\mathbf{x}_n |^2
+        
         .. math::
             n = 1, \\ldots, N-1
+        
         :param trajectory: trajectory array
         :param tau: time lag, it can be a single value or an array
         :return msd: return the ensemble averaged mean square displacement
@@ -125,6 +127,7 @@ class Trajectory(object):
         
         .. math::
             \\langle \\mathbf{r}^2 \\rangle (t) = \\frac{1}{N-1} \\sum_{n=1}^N |\\mathbf{x}_{n}-\\mathbf{x}_0|^2
+        
         :return msd: time-averaged msd
         """
         msd = np.zeros(len(trajectory))
@@ -144,8 +147,10 @@ class Trajectory(object):
             {\\langle r^2 \\rangle_{n_2 }} - \\frac{n_1}{n_2}
 
         with
+        
         .. math::
             n_1 < n_2
+            
         :return msd_ratio:
         """
 
@@ -329,6 +334,7 @@ class Trajectory(object):
         """
         Estimate the probability of Brownian particle with
         diffusivity D being trapped in the interval [-r0, +r0] after a period of time t.
+        
         .. math::
             P(r, D, t) = \\int_{-r_0}^{r_0} p(r, D, t) \\mathrm{d}r
 
