@@ -253,7 +253,7 @@ class Trajectory(object):
         """
 
         if len(eigenvalues) == 2:
-            eigenvalues.[::-1].sort() # the eigen values must the in the descending order
+            eigenvalues[::-1].sort() # the eigen values must the in the descending order
             
             asymmetry = - np.log(1. - np.power(eigenvalues[0] - eigenvalues[1], 2) /
                                  (2. * np.power(eigenvalues[0] + eigenvalues[1], 2)))
