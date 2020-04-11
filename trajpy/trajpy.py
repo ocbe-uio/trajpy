@@ -65,6 +65,7 @@ class Trajectory(object):
         self.fractal_dimension, self._r0 = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
         self.eigenvalues = np.linalg.eigvals(self.gyration_radius)
+        self.eigenvalues[::-1].sort() # the eigenvalues must be in the descending order
         self.anisotropy = self.anisotropy_(self.eigenvalues)
         self.kurtosis = self.kurtosis_(self.eigenvalues)
         self.straightness = self.straightness_(self._r)
@@ -252,6 +253,8 @@ class Trajectory(object):
         """
 
         if len(eigenvalues) == 2:
+            eigenvalues.[::-1].sort() # the eigen values must the in the descending order
+            
             asymmetry = - np.log(1. - np.power(eigenvalues[0] - eigenvalues[1], 2) /
                                  (2. * np.power(eigenvalues[0] + eigenvalues[1], 2)))
         else:
@@ -268,7 +271,9 @@ class Trajectory(object):
             a^2 = 1 - 3 \\frac{\\lambda_x\\lambda_y + \\lambda_y \\lambda_z + \\lambda_z\\lambda_x }{(\\lambda_x+\\lambda_y+\\lambda_z)^2}
 
         """
-
+        
+        eigenvalues[::-1].sort() # the eigen values must the in the descending order
+        
         anisotropy = 1. - 3. * ((eigenvalues[0] * eigenvalues[1]
                                 + eigenvalues[1] * eigenvalues[2]
                                 + eigenvalues[2] * eigenvalues[0])
