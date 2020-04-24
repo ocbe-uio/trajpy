@@ -38,6 +38,7 @@ Pythonic package for trajectory classification in 3D.
 - scipy >= 1.2.1
 - scikit-learn >= 0.20.3
 - matplotlib >= 3.0.3
+
 [ ~ Dependencies scanned by PyUp.io ~ ]
 
 ## Publications
