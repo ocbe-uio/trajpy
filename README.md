@@ -38,7 +38,7 @@ Pythonic package for trajectory classification in 3D.
 - scipy >= 1.2.1
 - scikit-learn >= 0.20.3
 - matplotlib >= 3.0.3
-
+[ ~ Dependencies scanned by PyUp.io ~ ]
 
 ## Publications
 M. Moreira-Soares, S. Pinto-Cunha, J. R. Bordin, R. D. M. Travasso. *["Adhesion modulates cell morphology and migration within dense fibrous networks"](https://www.biorxiv.org/content/10.1101/838995v1)*.  https://doi.org/10.1101/838995
