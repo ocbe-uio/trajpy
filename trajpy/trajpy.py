@@ -65,6 +65,7 @@ class Trajectory(object):
         self.fractal_dimension, self._r0 = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
         self.eigenvalues = np.linalg.eigvals(self.gyration_radius)
+        self.eigenvalues[::-1].sort() # the eigenvalues must be in the descending order
         self.anisotropy = self.anisotropy_(self.eigenvalues)
         self.kurtosis = self.kurtosis_(self.eigenvalues)
         self.straightness = self.straightness_(self._r)
@@ -93,8 +94,10 @@ class Trajectory(object):
         
         .. math::
             \\langle \\mathbf{r}_n^2 \\rangle = \\frac{1}{N-n} \\sum_{i=1}^{N-n} |\\mathbf{x}_{i+n} - \\mathbf{x}_n |^2
+        
         .. math::
             n = 1, \\ldots, N-1
+        
         :param trajectory: trajectory array
         :param tau: time lag, it can be a single value or an array
         :return msd: return the ensemble averaged mean square displacement
@@ -125,6 +128,7 @@ class Trajectory(object):
         
         .. math::
             \\langle \\mathbf{r}^2 \\rangle (t) = \\frac{1}{N-1} \\sum_{n=1}^N |\\mathbf{x}_{n}-\\mathbf{x}_0|^2
+        
         :return msd: time-averaged msd
         """
         msd = np.zeros(len(trajectory))
@@ -144,8 +148,10 @@ class Trajectory(object):
             {\\langle r^2 \\rangle_{n_2 }} - \\frac{n_1}{n_2}
 
         with
+        
         .. math::
             n_1 < n_2
+            
         :return msd_ratio:
         """
 
@@ -247,6 +253,8 @@ class Trajectory(object):
         """
 
         if len(eigenvalues) == 2:
+            eigenvalues[::-1].sort() # the eigen values must the in the descending order
+            
             asymmetry = - np.log(1. - np.power(eigenvalues[0] - eigenvalues[1], 2) /
                                  (2. * np.power(eigenvalues[0] + eigenvalues[1], 2)))
         else:
@@ -263,7 +271,9 @@ class Trajectory(object):
             a^2 = 1 - 3 \\frac{\\lambda_x\\lambda_y + \\lambda_y \\lambda_z + \\lambda_z\\lambda_x }{(\\lambda_x+\\lambda_y+\\lambda_z)^2}
 
         """
-
+        
+        eigenvalues[::-1].sort() # the eigen values must the in the descending order
+        
         anisotropy = 1. - 3. * ((eigenvalues[0] * eigenvalues[1]
                                 + eigenvalues[1] * eigenvalues[2]
                                 + eigenvalues[2] * eigenvalues[0])
@@ -329,6 +339,7 @@ class Trajectory(object):
         """
         Estimate the probability of Brownian particle with
         diffusivity D being trapped in the interval [-r0, +r0] after a period of time t.
+        
         .. math::
             P(r, D, t) = \\int_{-r_0}^{r_0} p(r, D, t) \\mathrm{d}r
 
