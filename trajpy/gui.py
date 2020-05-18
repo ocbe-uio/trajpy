@@ -10,6 +10,7 @@ from matplotlib.figure import Figure
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import trajpy.trajpy as tj
 
 
 class trajpy_gui:
@@ -18,16 +19,17 @@ class trajpy_gui:
         self.app = master
         self.app.title('TrajPy')
         self.app.geometry('600x600')
+        self.app.resizable(False, False)
         self.title = tk.Label(self.app, text="TrajPy", font=("Arial Bold", 28))
         self.entry = tk.Entry(self.app, width=50, highlightcolor='blue')
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.entry.insert(0, self.path)
-        self.canvas = FigureCanvasTkAgg(fig, master=self.app)  # A tk.DrawingArea.
-        self.find_bt = tk.Button(self.app, text="Find", command=self.get_file)
+        self.find_bt = tk.Button(self.app, text="Open", command=self.get_file)
         self.plot_bt = tk.Button(self.app, text="Plot", command=self.show_plot)
         self.button_select_all = tk.Checkbutton(self.app, text='Select all')
         self.button_select_all.configure(command=self.select_all)
-
+        self.button_compute = tk.Button(self.app, text="Compute!", command=self.compute)
+        self.results = tk.Entry(self.app, width=60, highlightcolor='blue')
 
         self.features = ['Anomalous Exponent', 'MSD Ratio', 'Fractal dimension',
                     'Anisotropy', 'Kurtosis', 'Straightness', 'Gaussianity', 'Confinement Prob.',
@@ -41,28 +43,39 @@ class trajpy_gui:
         self.placement()
 
     def placement(self):
-        self.title.place(relx=0.4, rely=0)
-        self.entry.place(relx=0.1, rely=0.2)
-        self.find_bt.place(relx=0.1, rely=0.3)
-        self.plot_bt.place(relx=0.3, rely=0.3)
+        self.title.place(x=250, y=10)
+        self.entry.place(x=80, y=100)
+        self.find_bt.place(x=380, y=130)
+        self.plot_bt.place(x=440, y=130)
         self.button_select_all.place(x=20, y=230 + (len(self.feats_) + 1) * 20)
-
+        self.button_compute.place(x=20, y=230 + (len(self.feats_) + 3) * 20)
+        self.results.place(x=20, y=230 + (len(self.feats_) + 5) * 20)
         for n, button in enumerate(self.feats_):
             self.feats_[n].configure(command=partial(self.select_feat, self.feats_[n]))
             self.feats_[n].place(x=20, y=220 + n * 20)
 
+    def open(self):
+        self.r = tj.Trajectory(self.path, skip_header=1, delimiter=',')
 
-    # actions
+    def compute(self):
+        results = self.r.compute_features()
+        self.results.insert(0,results)
+
     def get_file(self):
         filename = tk.filedialog.askopenfilename(parent=self.app,
                                                  initialdir=self.path,
                                                  title='Please select a file')
+        self.path = filename
         self.entry.delete(0, 100)
         self.entry.insert(0, filename)
 
     def show_plot(self):
-        self.canvas.draw()
-        self.canvas.get_tk_widget().place(relx=0.3, rely=0.6)
+        self.open()
+        self._fig = Figure(figsize=(3, 3), dpi=100)
+        self._canvas = FigureCanvasTkAgg(self._fig, master=self.app)
+        self._fig.add_subplot(111).plot(self.r._t, self.r._r, ls='-.')
+        self._canvas.draw()
+        self._canvas.get_tk_widget().place(x=200, y=200)
 
     def select_feat(self, button):
         if any(button.cget('text') in feature for feature in self.selected_features):
@@ -92,9 +105,6 @@ class trajpy_gui:
 # write ticking marks to select features to be computed
 
 if __name__ == '__main__':
-    fig = Figure(figsize=(3, 2), dpi=100)
-    t = np.arange(0, 3, .01)
-    fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t), ls='-.')
     root = ThemedTk(theme="randiance")
     tj_Gui = trajpy_gui(root)
     root.mainloop()
