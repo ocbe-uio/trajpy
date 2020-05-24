@@ -2,25 +2,25 @@ import tkinter as tk
 from ttkthemes import ThemedTk
 from functools import partial
 import os
+from PIL import ImageTk, Image
 from matplotlib.backends.backend_tkagg import (
     FigureCanvasTkAgg, NavigationToolbar2Tk)
 # Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
 import numpy as np
-import pandas as pd
-import seaborn as sns
 import trajpy.trajpy as tj
+import webbrowser
 
-
+print("Tcl Version: {}".format(tk.Tcl().eval('info patchlevel')))
 class trajpy_gui:
 
     def __init__(self, master):
         self.app = master
-        self.app.title('TrajPy')
-        self.app.geometry('600x600')
+        self.init_window()
         self.app.resizable(False, False)
         self.title = tk.Label(self.app, text="TrajPy", font=("Arial Bold", 28))
+        self._version = tk.Label(self.app, text="alpha", font=("Arial Bold", 12))
         self.entry = tk.Entry(self.app, width=50, highlightcolor='blue')
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.entry.insert(0, self.path)
@@ -42,8 +42,58 @@ class trajpy_gui:
 
         self.placement()
 
+    def init_window(self):
+        self.app.title('TrajPy GUI alpha')
+        self.app.geometry('600x600')
+
+        self.menu = tk.Menu(self.app)
+        self.app.config(menu=self.menu)
+
+
+        self.file = tk.Menu(self.menu)
+
+        self.file.add_command(label="Open...", command=self.get_file)
+        self.file.add_command(label="Open directory...", command=self.get_file)
+        self.file.add_command(label="Exit", command=self.client_exit)
+        self.menu.add_cascade(label="File", menu=self.file)
+
+        self.edit = tk.Menu(self.menu)
+        self.edit.add_command(label="Undo")
+        self.menu.add_cascade(label="Edit", menu=self.edit)
+
+        self.help = tk.Menu(self.menu)
+        self.help.add_command(label="About", command=self.About)
+        self.menu.add_cascade(label="Help", menu=self.help)
+
+    def client_exit(self):
+        exit()
+
+    def About(self):
+        self.newWindow = tk.Toplevel(self.app)
+        self.newWindow.resizable(False, False)
+        self.img = Image.open(os.path.dirname(os.path.realpath(__file__))+'/logo.png')
+        self.img = self.img.resize((300, 100), Image.BICUBIC)
+        self.img = ImageTk.PhotoImage(self.img)    
+        self._canvas = tk.Canvas(self.newWindow,width=300,height=100)
+        self._canvas.pack()
+        self._canvas.create_image(150, 50, image=self.img)
+        
+        #self._canvas.draw()
+       
+        #self.panel = tk.Label(self.newWindow, image=self.img)
+        #self.panel.pack(side = "top", fill = "both", expand = "no")
+        self.author = tk.Label(self.newWindow, text="Developed by Maurício Moreira-Soares")
+        self.link = tk.Label(self.newWindow, text="phydev.github.io", fg='blue')
+        self.email =tk.Label(self.newWindow, text="mms@uc.pt")
+        self.link.bind("<Button-1>", lambda e: webbrowser.open_new("https://phydev.github.io"))
+        self.author.pack()
+        self.link.pack()
+        self.email.pack()
+
+
     def placement(self):
         self.title.place(x=250, y=10)
+        self._version.place(x=300,y=50)
         self.entry.place(x=80, y=100)
         self.find_bt.place(x=380, y=130)
         self.plot_bt.place(x=440, y=130)
@@ -105,6 +155,6 @@ class trajpy_gui:
 # write ticking marks to select features to be computed
 
 if __name__ == '__main__':
-    root = ThemedTk(theme="randiance")
+    root = ThemedTk(theme="clearlooks")
     tj_Gui = trajpy_gui(root)
     root.mainloop()
