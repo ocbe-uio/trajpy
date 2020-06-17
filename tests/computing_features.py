@@ -88,7 +88,7 @@ class TestFeatures(unittest.TestCase):
         """
             testing the kurtosis function
         """
-        r = Trajectory()
+        r = tj.Trajectory()
         x1 = np.random.rand(100)
         x2 = np.random.rand(100)
         x3 = np.random.rand(100)
