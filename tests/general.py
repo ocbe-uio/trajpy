@@ -32,11 +32,8 @@ class TestGeneral(unittest.TestCase):
         self.assertEqual(init_from_tuple._r.all(), init_from_file._r.all())
         self.assertRaises(TypeError, tj.Trajectory, 1.0)
 
-        try:
-            r = tj.Trajectory(traj)
-            r.compute_features()
-        except Exception:
-            self.fail("An error occurred when running compute_all!")
+        r = tj.Trajectory(traj)
+        r.compute_features
 
 
 if __name__ == '__main__':

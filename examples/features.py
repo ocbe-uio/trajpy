@@ -10,4 +10,6 @@ print(r.efficiency,
       r.gaussianity,
       r.straightness,
       r.gyration_radius,
+      r.kurtosis,
+      r.anisotropy
       )

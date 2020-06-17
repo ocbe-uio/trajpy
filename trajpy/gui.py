@@ -108,7 +108,7 @@ class trajpy_gui:
         self.r = tj.Trajectory(self.path, skip_header=1, delimiter=',')
 
     def compute(self):
-        results = self.r.compute_features()
+        results = self.r.compute_features
         self.results.insert(0,results)
 
     def get_file(self):

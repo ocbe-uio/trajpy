@@ -84,6 +84,20 @@ class TestFeatures(unittest.TestCase):
         self.assertAlmostEqual(r.straightness_(x2), 0.0, places=2)
         self.assertAlmostEqual(r.straightness_(x1x2), 0.43, places=1)
 
+    def test_kurtosis(self):
+        """
+            testing the kurtosis function
+        """
+        r = Trajectory()
+        x1 = np.random.rand(100)
+        x2 = np.random.rand(100)
+        x3 = np.random.rand(100)
+        x1x2 = np.array([x1, x2, x3]).transpose()
+        r.gyration_radius = r.gyration_radius_(x1x2)
+        r.eigenvalues, r.eigenvectors = np.linalg.eig(r.gyration_radius)
+        idx = r.eigenvalues.argsort()[::-1]
+        r.kurtosis = r.kurtosis_(x1x2, r.eigenvectors[idx[0]])
+        self.assertAlmostEqual(r.kurtosis, 2.44, places=2)
 
 if __name__ == '__main__':
     unittest.main()

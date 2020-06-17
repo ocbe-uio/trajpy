@@ -57,22 +57,22 @@ class Trajectory(object):
 
         :return features: return the values of the features as a string.
         """
-        self.msd_ta = self.msd_time_averaged(self._r)
-        self.msd_ea = self.msd_ensemble_averaged(self._r,
-                                                 np.arange(len(self._r)))
-        self.msd_ratio = self.msd_ratio_(self.msd_ea, n1=2, n2=10)
+        self.msd_ta = self.msd_time_averaged(self._r,
+                                             np.arange(len(self._r)))
+        self.msd_ea = self.msd_ensemble_averaged(self._r)
+        self.msd_ratio = self.msd_ratio_(self.msd_ta, n1=2, n2=10)
         self.anomalous_exponent = self.anomalous_exponent_(self.msd_ta, self._t)
         self.fractal_dimension, self._r0 = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
-        self.eigenvalues = np.linalg.eigvals(self.gyration_radius)
-        self.eigenvalues[::-1].sort() # the eigenvalues must be in the descending order
+        self.eigenvalues, self.eigenvectors = np.linalg.eig(self.gyration_radius)
+        self.eigenvalues[::-1].sort()  # the eigenvalues must be in the descending order
+        self._idx = self.eigenvalues.argsort()[::-1]  # getting the position of the principal eigenvector
+        self.kurtosis = self.kurtosis_(self._r, self.eigenvectors[self._idx[0]])
         self.anisotropy = self.anisotropy_(self.eigenvalues)
-        self.kurtosis = self.kurtosis_(self.eigenvalues)
         self.straightness = self.straightness_(self._r)
         self.gaussianity = self.gaussianity_(self._r)
         self.efficiency = self.efficiency_(self._r)
-        self.diffusivity = self.anomalous_exponent_(self.msd_ea[:10], self._t[:10]) / 6.
-        self.confinement_probability = self.confinement_probability_(10, self.diffusivity, self._t[-1])
+
 
         features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
                     str(np.round(self.msd_ratio, 4)) + ',' +
@@ -81,14 +81,12 @@ class Trajectory(object):
                     str(np.round(self.kurtosis, 4)) + ',' +
                     str(np.round(self.straightness, 4)) + ',' +
                     str(np.round(self.gaussianity, 4)) + ',' +
-                    str(np.round(self.confinement_probability, 4)) + ',' +
-                    str(np.round(self.diffusivity, 4)) + ',' +
                     str(np.round(self.efficiency, 4)))
 
         return features
 
     @staticmethod
-    def msd_ensemble_averaged(trajectory, tau):
+    def msd_time_averaged(trajectory, tau):
         """
         calculates the ensemble-averaged mean squared displacement
         
@@ -122,7 +120,7 @@ class Trajectory(object):
         return msd
 
     @staticmethod
-    def msd_time_averaged(trajectory):
+    def msd_ensemble_averaged(trajectory):
         """
         calculates the time-averaged mean squared displacement
         
@@ -139,7 +137,7 @@ class Trajectory(object):
         return msd
 
     @staticmethod
-    def msd_ratio_(msd_ea, n1, n2):
+    def msd_ratio_(msd_ta, n1, n2):
         """
         Ratio of the ensemble averaged mean squared displacements.
 
@@ -155,7 +153,7 @@ class Trajectory(object):
         :return msd_ratio:
         """
 
-        msd_ratio = msd_ea[n1]/msd_ea[n2] - n1/n2
+        msd_ratio = msd_ta[n1]/msd_ta[n2] - n1/n2
         return msd_ratio
 
     @staticmethod
@@ -164,7 +162,7 @@ class Trajectory(object):
         Calculates the diffusion anomalous exponent
 
         .. math::
-            \\alpha = \\frac{  \\partial \\log{ \\left( \\langle x^2 \\rangle   \\right)} }{ \\partial (\\log{(t)}) }
+            \\beta = \\frac{  \\partial \\log{ \\left( \\langle x^2 \\rangle   \\right)} }{ \\partial (\\log{(t)}) }
 
         :param msd: mean square displacement
         :param time_lag: time interval
@@ -303,17 +301,28 @@ class Trajectory(object):
         return straightness
 
     @staticmethod
-    def kurtosis_(eigenvalues):
+    def kurtosis_(trajectory, eigenvector):
         """
-        Calculates the kurtosis  using the eigenvalues of the gyration radius with the following expression:
-
+        We obtain the kurtosis by projecting each position of the trajectory along the main principal eigenvector of the radius of gyration tensor
+         :math:`r_i^p = \mathbf{r} \cdot \hat{e}_1 and then calculating the quartic moment
         .. math::
-            \\kappa^2 = \\frac{3}{2}  \\frac{\\lambda_x^4 + \\lambda_y^4 + \\lambda_z^4 }{ \\left( \\lambda_x^2 + \\lambda_y^2 + \\lambda_z^2 \\right)^2 } - \\frac{1}{2}
+            K = \\frac{1}{N} \\sum_{i=1}^N \\frac{r_i^p - \\langle r^p \rangle}{\\sigma_{r^p}^4}  ,
+
+        where :math:`\langle r^p \rangle is the mean position of the projected trajectory and :math:`\sigma_{r^p}^2 is the variance. `
+        The kurtosis measures the peakiness of the distribution of points in the trajectory.
 
         :return kurtosis: K
         """
-        kurtosis = (3.0 / 2.0) * (np.sum(np.power(eigenvalues[:], 4)) /
-                                  np.sum(np.power(eigenvalues[:], 2))**2) - 1.0 / 2.0
+        N = len(trajectory)
+        r_projection = np.zeros(N)
+        for n, position in enumerate(trajectory):
+            r_projection[n] = np.dot(position, eigenvector)
+
+        mean_ = r_projection.mean()
+        std_ = r_projection.std()
+        r_projection -= mean_
+        kurtosis = (1./N) * np.sum(np.power(r_projection,4))/np.power(std_, 4)
+
 
         return kurtosis
 
@@ -375,3 +384,26 @@ class Trajectory(object):
             ((len(trajectory) - 1) * den)
 
         return efficiency
+
+    @staticmethod
+    def diffusivity_(msd_ta, timelag, ndim):
+        """
+        Calculates the short-time diffusivity for a gaussian trajectory
+        TODO: generalize for fractal diffusion using Green-Kubo relation
+        .. math::
+            D = \\frac{1}{2 n} \\frac{\\partial \\mathrm{TAMSD}}{\\partial t}
+
+        where n is the dimensionality.
+
+        :param msd: ensemble averaged mean squared displacement
+        :param timelag: time-lag
+        :param ndim: number of dimensions
+        :return diffusivity: short-time diffusion coefficient D
+        """
+
+        reg = LinearRegression()
+        reg.fit(timelag.reshape(-1,1), msd_ta)
+
+        diffusivity = np.round(reg.coef_[0], decimals=2)/(2*ndim)
+
+        return diffusivity
