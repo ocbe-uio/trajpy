@@ -61,7 +61,7 @@ class Trajectory(object):
                                              np.arange(len(self._r)))
         self.msd_ea = self.msd_ensemble_averaged(self._r)
         self.msd_ratio = self.msd_ratio_(self.msd_ta, n1=2, n2=10)
-        self.anomalous_exponent = self.anomalous_exponent_(self.msd_ta, self._t)
+        self.anomalous_exponent = self.anomalous_exponent_(self.msd_ea, self._t)
         self.fractal_dimension, self._r0 = self.fractal_dimension_(self._r)
         self.gyration_radius = self.gyration_radius_(self._r)
         self.eigenvalues, self.eigenvectors = np.linalg.eig(self.gyration_radius)
