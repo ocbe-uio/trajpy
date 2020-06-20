@@ -125,7 +125,7 @@ class Trajectory(object):
         .. math::
             \\langle \\mathbf{r}^2 \\rangle (t) = \\frac{1}{N-1} \\sum_{n=1}^N |\\mathbf{x}_{n}-\\mathbf{x}_0|^2
 
-        where :math:`N` is the number of trajectories,  :math:`\mathbf{r}_n(t)` is the position of the trajectory :mathm:`n` at time :math:`t`.
+        where :math:`N` is the number of trajectories,  :math:`\\mathbf{r}_n(t)` is the position of the trajectory :mathm:`n` at time :math:`t`.
 
         :return msd: time-averaged msd
         """
@@ -221,20 +221,10 @@ class Trajectory(object):
         """
         Calculates the gyration radius tensor of the trajectory
 
-        ..math ::
-            \\overline{ \\overline{R}} = \\begin{pmatrix}
-            R_{xx} & R_{xy} & R_{xz}\\\\
-            R_{yx} & R_{yy} & R_{yz} \\\\
-            R_{zx} & R_{zy }& R_{zz}
-            \\end{pmatrix} \\, ,
-
-
-        The components of the tensor of gyration are given by
-
         .. math::
             R_{mn} =  \\frac{1}{2N^2} \\sum_{i=1}^N \\sum_{j=1}^N \\left( r_{m}^{(i)} -  r_{m}^{(j)}  \\right)\\left( r_{n}^{(i)} -  r_{n}^{(j)} \\right)\\, ,
 
-        where :math:`N` is the number of segments of the trajectory, :math:`\mathbf{r}_i` is the :math:`i`-th position vector along the trajectory,
+        where :math:`N` is the number of segments of the trajectory, :math:`\\mathbf{r}_i` is the :math:`i`-th position vector along the trajectory,
         :math:`m` and :math:`n` assume the values of the corresponding coordinates along the directions :math:`x, y, z`.
         :return gyration_radius: tensor
         """
@@ -319,12 +309,12 @@ class Trajectory(object):
     def kurtosis_(trajectory, eigenvector):
         """
         We obtain the kurtosis by projecting each position of the trajectory along the main principal eigenvector of the radius of gyration tensor
-         :math:`r_i^p = \mathbf{r} \cdot \hat{e}_1` and then calculating the quartic moment
+         :math:`r_i^p = \\mathbf{r} \\cdot \\hat{e}_1` and then calculating the quartic moment
 
         .. math::
-            K = \\frac{1}{N} \\sum_{i=1}^N \\frac{ \\left(r_i^p - \\langle r^p \rangle \\right)^4}{\\sigma_{r^p}^4}  ,
+            K = \\frac{1}{N} \\sum_{i=1}^N \\frac{ \\left(r_i^p - \\langle r^p \\rangle \\right)^4}{\\sigma_{r^p}^4} \\, ,
 
-        where :math:`\langle r^p \rangle` is the mean position of the projected trajectory and :math:`\sigma_{r^p}^2` is the variance. `
+        where :math:`\\langle r^p \\rangle` is the mean position of the projected trajectory and :math:`\\sigma_{r^p}^2` is the variance.
         The kurtosis measures the peakiness of the distribution of points in the trajectory.
 
         :return kurtosis: K
