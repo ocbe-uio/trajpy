@@ -21,13 +21,13 @@ sys.path.insert(0, os.path.abspath('../'))
 # -- Project information -----------------------------------------------------
 
 project = 'trajpy'
-copyright = '2019, Mauricio Moreira'
-author = 'Mauricio Moreira'
+copyright = '2019, phydev'
+author = 'Mauricio Moreira-Soares'
 
 # The short X.Y version
 version = ''
 # The full version, including alpha/beta/rc tags
-release = '1.0.1'
+release = '1.2.1'
 
 
 # -- General configuration ---------------------------------------------------
