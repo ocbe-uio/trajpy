@@ -1,7 +1,7 @@
 import numpy as np
 import trajpy.auxiliar_functions as aux
 from sklearn.linear_model import LinearRegression
-
+import warnings
 
 class Trajectory(object):
     """
@@ -88,14 +88,12 @@ class Trajectory(object):
     @staticmethod
     def msd_time_averaged(trajectory, tau):
         """
-        calculates the ensemble-averaged mean squared displacement
+        calculates the time-averaged mean squared displacement
         
         .. math::
-            \\langle \\mathbf{r}_n^2 \\rangle = \\frac{1}{N-n} \\sum_{i=1}^{N-n} |\\mathbf{x}_{i+n} - \\mathbf{x}_n |^2
-        
-        .. math::
-            n = 1, \\ldots, N-1
-        
+            \\langle \\mathbf{r}_{\\tau}^2 \\rangle = \\frac{1}{T-\\tau} \\sum_{t=1}^{N-\\tau} |\\mathbf{x}_{t+\\tau} - \\mathbf{x}_{\\tau} |^2
+
+        where :math:`\\tau` is the time interval (time lag) between the two positions and $T$ is total trajectory time length
         :param trajectory: trajectory array
         :param tau: time lag, it can be a single value or an array
         :return msd: return the ensemble averaged mean square displacement
@@ -122,11 +120,13 @@ class Trajectory(object):
     @staticmethod
     def msd_ensemble_averaged(trajectory):
         """
-        calculates the time-averaged mean squared displacement
+        calculates the ensemble-averaged mean squared displacement
         
         .. math::
             \\langle \\mathbf{r}^2 \\rangle (t) = \\frac{1}{N-1} \\sum_{n=1}^N |\\mathbf{x}_{n}-\\mathbf{x}_0|^2
-        
+
+        where :math:`N is the number of trajectories,  :math:`\mathbf{r}_n(t) is the position of the trajectory :mathm:`n at time :math:`t`.
+
         :return msd: time-averaged msd
         """
         msd = np.zeros(len(trajectory))
@@ -142,13 +142,13 @@ class Trajectory(object):
         Ratio of the ensemble averaged mean squared displacements.
 
         .. math::
-            \\langle r^2 \\rangle_{n_1, n_2} = \\frac{\\langle r^2 \\rangle_{n_1 }}
-            {\\langle r^2 \\rangle_{n_2 }} - \\frac{n_1}{n_2}
+            \\langle r^2 \\rangle_{\\tau_1, \\tau_2} = \\frac{\\langle r^2 \\rangle_{\\tau_1 }}
+            {\\langle r^2 \\rangle_{\\tau_2 }} - \\frac{\\tau_1}{\\tau_2}
 
         with
         
         .. math::
-            n_1 < n_2
+            \\tau_1 < \\tau_2
             
         :return msd_ratio:
         """
@@ -305,8 +305,9 @@ class Trajectory(object):
         """
         We obtain the kurtosis by projecting each position of the trajectory along the main principal eigenvector of the radius of gyration tensor
          :math:`r_i^p = \mathbf{r} \cdot \hat{e}_1 and then calculating the quartic moment
+
         .. math::
-            K = \\frac{1}{N} \\sum_{i=1}^N \\frac{r_i^p - \\langle r^p \rangle}{\\sigma_{r^p}^4}  ,
+            K = \\frac{1}{N} \\sum_{i=1}^N \\frac{ \\left(r_i^p - \\langle r^p \rangle \\right)^4}{\\sigma_{r^p}^4}  ,
 
         where :math:`\langle r^p \rangle is the mean position of the projected trajectory and :math:`\sigma_{r^p}^2 is the variance. `
         The kurtosis measures the peakiness of the distribution of points in the trajectory.
@@ -389,7 +390,9 @@ class Trajectory(object):
     def diffusivity_(msd_ta, timelag, ndim):
         """
         Calculates the short-time diffusivity for a gaussian trajectory
+
         TODO: generalize for fractal diffusion using Green-Kubo relation
+
         .. math::
             D = \\frac{1}{2 n} \\frac{\\partial \\mathrm{TAMSD}}{\\partial t}
 
@@ -400,6 +403,7 @@ class Trajectory(object):
         :param ndim: number of dimensions
         :return diffusivity: short-time diffusion coefficient D
         """
+        warnings.warn('This function only works properly for normal diffusion.')
 
         reg = LinearRegression()
         reg.fit(timelag.reshape(-1,1), msd_ta)
