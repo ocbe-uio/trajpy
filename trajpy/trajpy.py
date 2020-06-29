@@ -93,10 +93,11 @@ class Trajectory(object):
         .. math::
             \\langle \\mathbf{r}_{\\tau}^2 \\rangle = \\frac{1}{T-\\tau} \\sum_{t=1}^{N-\\tau} |\\mathbf{x}_{t+\\tau} - \\mathbf{x}_{\\tau} |^2
 
-        where :math:`\\tau` is the time interval (time lag) between the two positions and $T$ is total trajectory time length
+        where :math:`\\tau` is the time interval (time lag) between the two positions and :math:`T is total trajectory time length.
+
         :param trajectory: trajectory array
         :param tau: time lag, it can be a single value or an array
-        :return msd: return the ensemble averaged mean square displacement
+        :return msd: time-averaged MSD
         """
         if type(tau) == int:
             tau = np.asarray([tau])
@@ -125,9 +126,9 @@ class Trajectory(object):
         .. math::
             \\langle \\mathbf{r}^2 \\rangle (t) = \\frac{1}{N-1} \\sum_{n=1}^N |\\mathbf{x}_{n}-\\mathbf{x}_0|^2
 
-        where :math:`N` is the number of trajectories,  :math:`\\mathbf{r}_n(t)` is the position of the trajectory :mathm:`n` at time :math:`t`.
+        where :math:`N` is the number of trajectories,  :math:`\\mathbf{r}_n(t)` is the position of the trajectory :math:`n` at time :math:`t`.
 
-        :return msd: time-averaged msd
+        :return msd: ensemble-averaged msd
         """
         msd = np.zeros(len(trajectory))
         for n in range(0, len(trajectory)):
@@ -226,6 +227,7 @@ class Trajectory(object):
 
         where :math:`N` is the number of segments of the trajectory, :math:`\\mathbf{r}_i` is the :math:`i`-th position vector along the trajectory,
         :math:`m` and :math:`n` assume the values of the corresponding coordinates along the directions :math:`x, y, z`.
+
         :return gyration_radius: tensor
         """
 
@@ -271,7 +273,7 @@ class Trajectory(object):
         Calculates the trajectory anisotropy using the eigenvalues of the gyration radius tensor.
 
         .. math::
-            a^2 = 1 - 3 \\frac{\\lambda_x\\lambda_y + \\lambda_y \\lambda_z + \\lambda_z\\lambda_x }{(\\lambda_x+\\lambda_y+\\lambda_z)^2}
+            a^2 = 1 - 3 \\frac{\\lambda_1\\lambda_2 + \\lambda_2 \\lambda_3 + \\lambda_3\\lambda_1 }{(\\lambda_1+\\lambda_2+\\lambda_3)^2}
 
         """
         
