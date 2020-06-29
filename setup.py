@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='trajpy',
-    version='1.2.1',
+    version='1.3.0',
     url='https://github.com/phydev/trajpy.git',
     author='Mauricio Moreira',
     author_email='mms@uc.pt',
