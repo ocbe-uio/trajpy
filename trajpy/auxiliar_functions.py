@@ -54,7 +54,7 @@ def unfold ( r_old, r ):
     box is accessed from the calling program.
     The function returns the unfolded version of r.
     
-    From the book: Computer Simulations of Liquids
+    From the book: Computer Simulation of Liquids
     git: github.com/Allen-Tildesley/
     Authors: Michael P. Allen and Dominic J. Tildesley
     """
