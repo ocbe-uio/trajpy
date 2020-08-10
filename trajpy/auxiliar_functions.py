@@ -44,3 +44,22 @@ def einstein_diffusion_probability(r, D, t):
     A = 1. / np.power(4. * np.pi * D * t, 0.5)
     probability = A * np.exp(-np.power(r, 2) / (4. * D * t))
     return probability
+
+
+def unfold ( r_old, r ):
+    """
+    Removes effects of periodic boundaries on particle trajectories.
+    r_old is the configuration at the previous step 
+    r is the current configuration
+    box is accessed from the calling program.
+    The function returns the unfolded version of r.
+    
+    From the book: Computer Simulations of Liquids
+    git: github.com/Allen-Tildesley/
+    Authors: Michael P. Allen and Dominic J. Tildesley
+    """
+
+    r_new = r - r_old                      #  Convert r to displacements relative to r_old
+    r_new = r_new - np.rint(r_new/box)*box # Apply periodic boundaries to displacements
+    r_new = r_new + r_old                  # Convert r back to absolute coordinates
+    return r_new
