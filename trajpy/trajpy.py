@@ -9,7 +9,7 @@ class Trajectory(object):
     as a dummy object for calling its functions or you can initialize
     it with a trajectory array or csv file.
     """
-    def __init__(self, trajectory=np.zeros((1, 2)), **params):
+    def __init__(self, trajectory=np.zeros((1, 2)), box_length=None, **params):
         """
         Initialization function that can be left blank for using staticmethods.
         It can be initialized with an array with shape (N, dim)
@@ -33,6 +33,9 @@ class Trajectory(object):
         else:
             raise TypeError('trajectory receives an array or a filename as input.')
 
+        if box_length != None:
+            self._r = aux.unfold(self._r[0], self._r, box_length)
+            
         self.msd_ta = None  # time-averaged mean squared displacement
         self.msd_ea = None  # ensemble-averaged mean squared displacement
         self.msd_ratio = None
@@ -130,6 +133,7 @@ class Trajectory(object):
 
         :return msd: ensemble-averaged msd
         """
+        
         msd = np.zeros(len(trajectory))
         for n in range(0, len(trajectory)):
             msd[n] = np.sum(np.power(trajectory[n] - trajectory[0], 2))
