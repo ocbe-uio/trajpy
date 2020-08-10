@@ -46,7 +46,7 @@ def einstein_diffusion_probability(r, D, t):
     return probability
 
 
-def unfold ( r_old, r ):
+def unfold (r_old, r, box):
     """
     Removes effects of periodic boundaries on particle trajectories.
     r_old is the configuration at the previous step 
