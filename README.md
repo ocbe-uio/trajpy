@@ -65,7 +65,7 @@ The features will be stored in the object `r`, for instance:
 ```python
   >>> r.asymmetry
   >>> 0.5782095322093505
-  >>> r.fractal_dimension
+  >>> r.fractal_dimensiona
   >>> 1.04
   >>> r.efficiency
   >>> 0.29363293632936327
