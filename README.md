@@ -75,7 +75,7 @@ The features will be stored in the object `r`, for instance:
   >>>     [ 0.96782673,  0.27296851,  2.41663589]])
 ```
 
-For more examples please consult the extended documentation: https://readthedocs.org/trajpy
+For more examples please consult the extended documentation: https://trajpy.readthedocs.io/
 
 ## Requirements
 
