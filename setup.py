@@ -15,6 +15,6 @@ setup(
     packages=find_packages(),
     install_requires=['numpy >= 1.16.5',
                       'matplotlib >= 3.0.3',
-                      'scipy == 1.3.0',
+                      'scipy == 1.5.0',
                       'scikit-learn >= 0.20.3'],
 )

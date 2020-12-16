@@ -97,7 +97,7 @@ class TestFeatures(unittest.TestCase):
         r.eigenvalues, r.eigenvectors = np.linalg.eig(r.gyration_radius)
         idx = r.eigenvalues.argsort()[::-1]
         r.kurtosis = r.kurtosis_(x1x2, r.eigenvectors[idx[0]])
-        self.assertAlmostEqual(r.kurtosis, 2.33, places=1)
+        self.assertAlmostEqual(r.kurtosis, 2.26, places=1)
 
 
     def test_green_kubo(self):
