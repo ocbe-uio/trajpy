@@ -13,7 +13,7 @@ setup(
     license='GNU GPLv3',
     platform='Python 3.7',
     packages=find_packages(),
-    install_requires=['numpy >= 1.14.3',
+    install_requires=['numpy >= 1.16.5',
                       'matplotlib >= 3.0.3',
                       'scipy >= 1.3.0',
                       'scikit-learn >= 0.20.3'],
