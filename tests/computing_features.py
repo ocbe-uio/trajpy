@@ -99,5 +99,21 @@ class TestFeatures(unittest.TestCase):
         r.kurtosis = r.kurtosis_(x1x2, r.eigenvectors[idx[0]])
         self.assertAlmostEqual(r.kurtosis, 2.33, places=1)
 
+
+    def test_green_kubo(self):
+        """
+            test Green-Kubo diffusivity function
+        """
+
+        r = tj.Trajectory()
+        x1 = np.linspace(0,100,100)
+        x2 = np.random.rand(100)
+        x3 = np.random.rand(100)
+        r._r = np.array([x1, x2, x3]).transpose()
+        r._t = np.linspace(0,100,100)
+        self.assertAlmostEqual(r.green_kubo_(), 50.53, places=1)
+
+
+
 if __name__ == '__main__':
     unittest.main()

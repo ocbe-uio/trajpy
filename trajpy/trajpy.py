@@ -53,6 +53,7 @@ class Trajectory(object):
         self.confinement_probability = None
         self.diffusivity = None
         self._r0 = None  # maximum distance between any two points of the trajectory
+        self._velocity = None
 
     def compute_features(self):
         """
@@ -396,6 +397,50 @@ class Trajectory(object):
             ((len(trajectory) - 1) * den)
 
         return efficiency
+
+ 
+    def _velocity_(self):
+        """
+            computes the velocity associated with the trajectory stored in (self._r, self._t)
+        """
+        
+        self._velocity = np.gradient(self._r, axis=0)/(self._t[1]-self._t[0])
+
+        return self._velocity
+
+    
+    def _stationary_velocity_correlation(self, tau):
+        """
+            computes the stationary velocity correlation function
+
+            .. math:
+                \\langle \\vec{v(t+\\tau)} \\vec{v(t)} \\rangle
+
+        """
+
+        time_averaged_corr_velocity = 0.
+        N = len(self._velocity)
+
+        for n in range(0, N-tau):
+            # time averaged along the trajectory
+            time_averaged_corr_velocity += np.dot(self._velocity[n+tau, :], self._velocity[n, :])/N
+
+        return time_averaged_corr_velocity 
+
+
+    def green_kubo_(self):
+        """
+            computes the generalised Green-Kubo's diffusion constant
+        """
+        
+        self._velocity_()
+        self.diffusivity = 0.
+        N = len(self._velocity)
+        
+        for tau in range(0, N-1):
+            self.diffusivity += self._stationary_velocity_correlation(tau)
+
+        return self.diffusivity
 
     @staticmethod
     def diffusivity_(msd_ta, timelag, ndim):
