@@ -1,6 +1,6 @@
 import numpy as np
+from scipy.stats import linregress
 import trajpy.auxiliar_functions as aux
-from sklearn.linear_model import LinearRegression
 import warnings
 
 class Trajectory(object):
@@ -76,6 +76,7 @@ class Trajectory(object):
         self.straightness = self.straightness_(self._r)
         self.gaussianity = self.gaussianity_(self._r)
         self.efficiency = self.efficiency_(self._r)
+        self.diffusivity = self.green_kubo_()
 
 
         features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
@@ -85,7 +86,8 @@ class Trajectory(object):
                     str(np.round(self.kurtosis, 4)) + ',' +
                     str(np.round(self.straightness, 4)) + ',' +
                     str(np.round(self.gaussianity, 4)) + ',' +
-                    str(np.round(self.efficiency, 4)))
+                    str(np.round(self.efficiency, 4))) + ',' +
+                    str(np.round(self.diffusivity, 4)))
 
         return features
 
@@ -179,12 +181,10 @@ class Trajectory(object):
         time_log = np.log(time_lag[1:])
 
         x, y = time_log, msd_log
-        x = x.reshape(-1, 1)
 
-        reg = LinearRegression()
-        reg.fit(x, y)
+        slope, intercept, r_value, p_value, std_err = linregress(x, y)
 
-        anomalous_exponent = np.round(reg.coef_[0], decimals=2)
+        anomalous_exponent = np.round(slope, decimals=2)
 
         return anomalous_exponent
 
@@ -459,11 +459,10 @@ class Trajectory(object):
         :param ndim: number of dimensions
         :return diffusivity: short-time diffusion coefficient D
         """
-        warnings.warn('This function only works properly for normal diffusion.')
+        warnings.warn('diffusivity is deprecated and will be removed soon. Please use green_kubo_ instead.')
 
-        reg = LinearRegression()
-        reg.fit(timelag.reshape(-1,1), msd_ta)
+        slope, intercept, r_value, p_value, std_err = linregress(timelag, msd_ta)
 
-        diffusivity = np.round(reg.coef_[0], decimals=2)/(2*ndim)
+        diffusivity = np.round(slope, decimals=2)/(2*ndim)
 
         return diffusivity
