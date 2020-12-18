@@ -86,7 +86,7 @@ class Trajectory(object):
                     str(np.round(self.kurtosis, 4)) + ',' +
                     str(np.round(self.straightness, 4)) + ',' +
                     str(np.round(self.gaussianity, 4)) + ',' +
-                    str(np.round(self.efficiency, 4))) + ',' +
+                    str(np.round(self.efficiency, 4)) + ',' +
                     str(np.round(self.diffusivity, 4)))
 
         return features
@@ -441,28 +441,3 @@ class Trajectory(object):
             self.diffusivity += self._stationary_velocity_correlation(tau)
 
         return self.diffusivity
-
-    @staticmethod
-    def diffusivity_(msd_ta, timelag, ndim):
-        """
-        Calculates the short-time diffusivity for a gaussian trajectory
-
-        TODO: generalize for fractal diffusion using Green-Kubo relation
-
-        .. math::
-            D = \\frac{1}{2 n} \\frac{\\partial \\mathrm{TAMSD}}{\\partial t}
-
-        where :math:`n` is the dimensionality.
-
-        :param msd: ensemble averaged mean squared displacement
-        :param timelag: time-lag
-        :param ndim: number of dimensions
-        :return diffusivity: short-time diffusion coefficient D
-        """
-        warnings.warn('diffusivity is deprecated and will be removed soon. Please use green_kubo_ instead.')
-
-        slope, intercept, r_value, p_value, std_err = linregress(timelag, msd_ta)
-
-        diffusivity = np.round(slope, decimals=2)/(2*ndim)
-
-        return diffusivity
