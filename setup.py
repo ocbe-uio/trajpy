@@ -13,6 +13,6 @@ setup(
     license='GNU GPLv3',
     platform='Python 3.7',
     packages=find_packages(),
-    install_requires=['numpy >= 1.16.5',
-                      'scipy == 1.5.0'],
+    install_requires=['numpy >= 1.14.3',
+                      'scipy == 1.5.4'],
 )

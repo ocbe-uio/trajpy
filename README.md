@@ -80,7 +80,7 @@ For more examples please consult the extended documentation: https://trajpy.read
 ## Requirements
 
 - numpy >= 1.14.3
-- scipy >= 1.2.1
+- scipy >= 1.5.4
 
 [ ~ Dependencies scanned by PyUp.io ~ ]
 
