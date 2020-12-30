@@ -1,5 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/trajpy.svg)](https://badge.fury.io/py/trajpy)
-[![Maintainability](https://api.codeclimate.com/v1/badges/650cde37de8ccb468b8c/maintainability)](https://codeclimate.com/github/ocbe-uio/trajpy/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/650cde37de8ccb468b8c/maintainability)](https://codeclimate.com/github/phydev/trajpy/maintainability)
 [![codecov](https://codecov.io/gh/ocbe-uio/trajpy/branch/master/graph/badge.svg?token=lhYwQjiAlU)](https://codecov.io/gh/ocbe-uio/trajpy)
 [![Build Status](https://travis-ci.com/ocbe-uio/trajpy.svg?branch=master)](https://travis-ci.com/ocbe-uio/trajpy)
 [![PyUp](https://pyup.io/repos/github/ocbe-uio/trajpy/shield.svg?t=1570846676802)](https://pyup.io/repos/github/ocbe-uio/trajpy/)
@@ -65,7 +65,7 @@ The features will be stored in the object `r`, for instance:
 ```python
   >>> r.asymmetry
   >>> 0.5782095322093505
-  >>> r.fractal_dimensiona
+  >>> r.fractal_dimension
   >>> 1.04
   >>> r.efficiency
   >>> 0.29363293632936327
@@ -81,8 +81,6 @@ For more examples please consult the extended documentation: https://trajpy.read
 
 - numpy >= 1.14.3
 - scipy >= 1.2.1
-- scikit-learn >= 0.20.3
-- matplotlib >= 3.0.3
 
 [ ~ Dependencies scanned by PyUp.io ~ ]
 

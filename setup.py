@@ -14,6 +14,5 @@ setup(
     platform='Python 3.7',
     packages=find_packages(),
     install_requires=['numpy >= 1.16.5',
-                      'matplotlib >= 3.0.3',
                       'scipy == 1.5.0'],
 )
