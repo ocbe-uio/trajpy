@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import linregress
+from scipy.integrate import cumtrapz
 import trajpy.auxiliar_functions as aux
 import warnings
 
@@ -67,16 +68,19 @@ class Trajectory(object):
         self.msd_ratio = self.msd_ratio_(self.msd_ta, n1=2, n2=10)
         self.anomalous_exponent = self.anomalous_exponent_(self.msd_ea, self._t)
         self.fractal_dimension, self._r0 = self.fractal_dimension_(self._r)
+
         self.gyration_radius = self.gyration_radius_(self._r)
         self.eigenvalues, self.eigenvectors = np.linalg.eig(self.gyration_radius)
         self.eigenvalues[::-1].sort()  # the eigenvalues must be in the descending order
         self._idx = self.eigenvalues.argsort()[::-1]  # getting the position of the principal eigenvector
         self.kurtosis = self.kurtosis_(self._r, self.eigenvectors[self._idx[0]])
         self.anisotropy = self.anisotropy_(self.eigenvalues)
+
         self.straightness = self.straightness_(self._r)
         self.gaussianity = self.gaussianity_(self._r)
         self.efficiency = self.efficiency_(self._r)
         self.diffusivity = self.green_kubo_()
+        self.confinement_probability = self.confinement_probability_(2,self.diffusivity, self._t[-1])
 
 
         features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
@@ -90,6 +94,7 @@ class Trajectory(object):
                     str(np.round(self.diffusivity, 4)))
 
         return features
+
 
     @staticmethod
     def msd_time_averaged(trajectory, tau):
@@ -357,8 +362,8 @@ class Trajectory(object):
         return gaussianity
 
     @staticmethod
-    def confinement_probability_(r0, D, t):
-        """
+    def confinement_probability_(r0, D, t, N=100):
+        """ new
         Estimate the probability of Brownian particle with
         diffusivity :math:`D` being trapped in the interval :math:`[-r0, +r0]` after a period of time t.
         
@@ -370,11 +375,13 @@ class Trajectory(object):
         :param t: time length
         :return probability: probability of the particle being confined
         """
-        x = np.zeros(2 * r0)
-        for N in range(-r0, r0):
-            x[r0 + N] = aux.einstein_diffusion_probability(N, D, t)
-        probability = np.sum(x)
-        return probability
+        p = np.zeros(N)
+        X = np.linspace(-r0, r0, N)
+        dx = X[1]-X[0]
+        for n, x in enumerate(X):
+            p[n] = aux.einstein_diffusion_probability(x, D, t)
+        probability = np.sum(p)*dx
+        return 1-probability
 
     @staticmethod
     def efficiency_(trajectory):
@@ -399,12 +406,12 @@ class Trajectory(object):
         return efficiency
 
  
-    def _velocity_(self):
+    def velocity_(self):
         """
             computes the velocity associated with the trajectory stored in (self._r, self._t)
         """
         
-        self._velocity = np.gradient(self._r, axis=0)/(self._t[1]-self._t[0])
+        self._velocity = np.diff(self._r, axis=0)/(self._t[1]-self._t[0])
 
         return self._velocity
 
@@ -423,9 +430,9 @@ class Trajectory(object):
 
         for n in range(0, N-tau):
             # time averaged along the trajectory
-            time_averaged_corr_velocity += np.dot(self._velocity[n+tau, :], self._velocity[n, :])/N
+            time_averaged_corr_velocity += np.dot(self._velocity[n+tau, :], self._velocity[n, :])
 
-        return time_averaged_corr_velocity 
+        return time_averaged_corr_velocity / (N-tau)
 
 
     def green_kubo_(self):
@@ -433,11 +440,12 @@ class Trajectory(object):
             computes the generalised Green-Kubo's diffusion constant
         """
         
-        self._velocity_()
+        self.velocity_()
         self.diffusivity = 0.
         N = len(self._velocity)
-        
-        for tau in range(0, N-1):
-            self.diffusivity += self._stationary_velocity_correlation(tau)
+        dt = self._t[1] - self._t[0]
+
+        for tau in range(1, N-1):
+            self.diffusivity += self._stationary_velocity_correlation(tau) * dt/3
 
         return self.diffusivity
