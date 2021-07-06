@@ -309,7 +309,7 @@ class Trajectory(object):
         """
         summation = 0.
 
-        for i_pos in range(1, len(trajectory) - 1):
+        for i_pos in range(1, len(trajectory)):
             summation += np.sqrt(np.dot(trajectory[i_pos] - trajectory[i_pos - 1],
                                         trajectory[i_pos] - trajectory[i_pos - 1]))
 
