@@ -80,11 +80,10 @@ class Trajectory(object):
         self.gaussianity = self.gaussianity_(self._r)
         self.efficiency = self.efficiency_(self._r)
         self.diffusivity = self.green_kubo_()
-        self.confinement_probability = self.confinement_probability_(2,self.diffusivity, self._t[-1])
+        #self.confinement_probability = self.confinement_probability_(2,self.diffusivity, self._t[-1])
 
-
-        features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
-                    str(np.round(self.msd_ratio, 4)) + ',' +
+        #(str(np.round(self.anomalous_exponent, 4)) + ',' +
+        features = (str(np.round(self.msd_ratio, 4)) + ',' +
                     str(np.round(self.fractal_dimension, 4)) + ',' +
                     str(np.round(self.anisotropy, 4)) + ',' +
                     str(np.round(self.kurtosis, 4)) + ',' +
@@ -97,16 +96,16 @@ class Trajectory(object):
 
 
     @staticmethod
-    def msd_time_averaged(trajectory, tau):
+    def msd_time_averaged(spatial_components, tau):
         """
-        calculates the time-averaged mean squared displacement
+        calculates t time-averaged mean squared displacement
         
         .. math::
             \\langle \\mathbf{r}_{\\tau}^2 \\rangle = \\frac{1}{T-\\tau} \\sum_{t=1}^{N-\\tau} |\\mathbf{x}_{t+\\tau} - \\mathbf{x}_{\\tau} |^2
 
         where :math:`\\tau` is the time interval (time lag) between the two positions and :math:`T is total trajectory time length.
 
-        :param trajectory: trajectory array
+        :param spatial_components: array containing trajectory spatial coordinates
         :param tau: time lag, it can be a single value or an array
         :return msd: time-averaged MSD
         """
@@ -119,18 +118,18 @@ class Trajectory(object):
 
             dx = []
 
-            for n in range(0, len(trajectory) - value):
-                dx.append(trajectory[n + value] - trajectory[n])
+            for n in range(0, len(spatial_components) - value):
+                dx.append(spatial_components[n + value] - spatial_components[n])
 
             dx = np.asarray(dx)
 
-            msd[time_lag] = np.sum(np.power(dx, 2)) / (trajectory.size - value + 1)
+            msd[time_lag] = np.sum(np.power(dx, 2)) / (spatial_components.size - value + 1)
             time_lag += 1
 
         return msd
 
     @staticmethod
-    def msd_ensemble_averaged(trajectory):
+    def msd_ensemble_averaged(spatial_components):
         """
         calculates the ensemble-averaged mean squared displacement
         
@@ -139,13 +138,14 @@ class Trajectory(object):
 
         where :math:`N` is the number of trajectories,  :math:`\\mathbf{r}_n(t)` is the position of the trajectory :math:`n` at time :math:`t`.
 
+        :param spatial_components: array containing trajectory spatial coordinates
         :return msd: ensemble-averaged msd
         """
         
-        msd = np.zeros(len(trajectory))
-        for n in range(0, len(trajectory)):
-            msd[n] = np.sum(np.power(trajectory[n] - trajectory[0], 2))
-        msd = msd / (len(trajectory) - 1)
+        msd = np.zeros(len(spatial_components))
+        for n in range(0, len(spatial_components)):
+            msd[n] = np.sum(np.power(spatial_components[n] - spatial_components[0], 2))
+        msd = msd / (len(spatial_components) - 1)
 
         return msd
 
@@ -309,7 +309,7 @@ class Trajectory(object):
         """
         summation = 0.
 
-        for i_pos in range(1, len(trajectory) - 1):
+        for i_pos in range(1, len(trajectory)):
             summation += np.sqrt(np.dot(trajectory[i_pos] - trajectory[i_pos - 1],
                                         trajectory[i_pos] - trajectory[i_pos - 1]))
 
@@ -405,7 +405,7 @@ class Trajectory(object):
 
         return efficiency
 
- 
+    @staticmethod
     def velocity_(self):
         """
             computes the velocity associated with the trajectory stored in (self._r, self._t)
@@ -415,26 +415,27 @@ class Trajectory(object):
 
         return self._velocity
 
-    
-    def _stationary_velocity_correlation(self, tau):
+    @staticmethod
+    def _stationary_velocity_correlation(self, taus):
         """
-            computes the stationary velocity correlation function
+            computes the stationary velocity autocorrelation function by time average
 
             .. math:
                 \\langle \\vec{v(t+\\tau)} \\vec{v(t)} \\rangle
-
+        :param taus: single non-negative integer value or array of non-negative integers representing
+        the time step used to compare velocity values
         """
 
-        time_averaged_corr_velocity = 0.
+        time_averaged_corr_velocity = np.zeros(len(taus))
         N = len(self._velocity)
+        for tau in taus:
+            time_averaged_corr_velocity[tau] = (np.sum(np.einsum('ij,ij->i',
+                np.take(a=self._velocity,indices=np.arange(0,N-tau)+tau,axis=0),
+                np.take(a=self._velocity,indices=np.arange(0,N-tau),axis=0)))+ 
+                time_averaged_corr_velocity[tau-1])*(self._t[1]-self._t[0]) / (N-tau)
+        return time_averaged_corr_velocity
 
-        for n in range(0, N-tau):
-            # time averaged along the trajectory
-            time_averaged_corr_velocity += np.dot(self._velocity[n+tau, :], self._velocity[n, :])
-
-        return time_averaged_corr_velocity / (N-tau)
-
-
+    @staticmethod
     def green_kubo_(self):
         """
             computes the generalised Green-Kubo's diffusion constant
