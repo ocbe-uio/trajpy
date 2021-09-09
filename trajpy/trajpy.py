@@ -405,7 +405,6 @@ class Trajectory(object):
 
         return efficiency
 
-    @staticmethod
     def velocity_(self):
         """
             computes the velocity associated with the trajectory stored in (self._r, self._t)
@@ -415,15 +414,16 @@ class Trajectory(object):
 
         return self._velocity
 
-    @staticmethod
+    
     def _stationary_velocity_correlation(self, taus):
         """
             computes the stationary velocity autocorrelation function by time average
 
             .. math:
                 \\langle \\vec{v(t+\\tau)} \\vec{v(t)} \\rangle
-        :param taus: single non-negative integer value or array of non-negative integers representing
-        the time step used to compare velocity values
+        
+        :param taus: single or array of non-negative integers representing the time lag
+        :return time_averaged_corr_velocity: velocity autocorrelation function output
         """
 
         time_averaged_corr_velocity = np.zeros(len(taus))
@@ -435,7 +435,7 @@ class Trajectory(object):
                 time_averaged_corr_velocity[tau-1])*(self._t[1]-self._t[0]) / (N-tau)
         return time_averaged_corr_velocity
 
-    @staticmethod
+    
     def green_kubo_(self):
         """
             computes the generalised Green-Kubo's diffusion constant
