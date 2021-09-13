@@ -422,7 +422,7 @@ class Trajectory(object):
             .. math:
                 \\langle \\vec{v(t+\\tau)} \\vec{v(t)} \\rangle
         
-        :param taus: single or array of non-negative integers representing the time lag
+        :param taus: single or array of non-negative integer values representing the time lag
         :return time_averaged_corr_velocity: velocity autocorrelation function output
         """
 
