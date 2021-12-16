@@ -1,3 +1,5 @@
+#from _typeshed import Self
+#from os import stat
 import numpy as np
 from scipy.stats import linregress
 from scipy.integrate import cumtrapz
@@ -54,7 +56,9 @@ class Trajectory(object):
         self.confinement_probability = None
         self.diffusivity = None
         self._r0 = None  # maximum distance between any two points of the trajectory
-        self._velocity = None
+        self.velocity = None
+        self.velocity_description = None
+        self.frequency_spectrum = None
 
     def compute_features(self):
         """
@@ -80,6 +84,8 @@ class Trajectory(object):
         self.gaussianity = self.gaussianity_(self._r)
         self.efficiency = self.efficiency_(self._r)
         self.diffusivity = self.green_kubo_()
+        self.velocity_description = self.velocity_description_(self.velocity)
+        self.frequency_spectrum = self.frequency_spectrum_(self._r,self.t)
         #self.confinement_probability = self.confinement_probability_(2,self.diffusivity, self._t[-1])
 
         #(str(np.round(self.anomalous_exponent, 4)) + ',' +
@@ -98,7 +104,7 @@ class Trajectory(object):
     @staticmethod
     def msd_time_averaged(spatial_components, tau):
         """
-        calculates t time-averaged mean squared displacement
+        calculates the time-averaged mean squared displacement
         
         .. math::
             \\langle \\mathbf{r}_{\\tau}^2 \\rangle = \\frac{1}{T-\\tau} \\sum_{t=1}^{N-\\tau} |\\mathbf{x}_{t+\\tau} - \\mathbf{x}_{\\tau} |^2
@@ -386,8 +392,8 @@ class Trajectory(object):
     @staticmethod
     def efficiency_(trajectory):
         """
-        Calculates the efficiency of the movement, a measure that is related to
-        the straightness.
+            Calculates the efficiency of the movement, a measure that is related to
+            the straightness.
 
         .. math::
             E = \\frac{|\\mathbf{x}_{N-1} - \\mathbf{x}_{0}|^2  }
@@ -404,20 +410,21 @@ class Trajectory(object):
             ((len(trajectory) - 1) * den)
 
         return efficiency
-
-    def velocity_(self):
+    
+    @staticmethod
+    def velocity_(position,time):
         """
-            computes the velocity associated with the trajectory stored in (self._r, self._t)
+            Computes the velocity associated with the trajectory
         """
         
-        self._velocity = np.diff(self._r, axis=0)/(self._t[1]-self._t[0])
+        velocity = np.diff(position, axis=0)/(time[1]-time[0])
 
-        return self._velocity
+        return velocity
 
     
     def _stationary_velocity_correlation(self, taus):
         """
-            computes the stationary velocity autocorrelation function by time average
+            Computes the stationary velocity autocorrelation function by time average
 
             .. math:
                 \\langle \\vec{v(t+\\tau)} \\vec{v(t)} \\rangle
@@ -427,26 +434,106 @@ class Trajectory(object):
         """
 
         time_averaged_corr_velocity = np.zeros(len(taus))
-        N = len(self._velocity)
+        N = len(self.velocity)
         for tau in taus:
             time_averaged_corr_velocity[tau] = (np.sum(np.einsum('ij,ij->i',
-                np.take(a=self._velocity,indices=np.arange(0,N-tau)+tau,axis=0),
-                np.take(a=self._velocity,indices=np.arange(0,N-tau),axis=0)))+ 
+                np.take(a=self.velocity,indices=np.arange(0,N-tau)+tau,axis=0),
+                np.take(a=self.velocity,indices=np.arange(0,N-tau),axis=0)))+ 
                 time_averaged_corr_velocity[tau-1])*(self._t[1]-self._t[0]) / (N-tau)
         return time_averaged_corr_velocity
 
     
     def green_kubo_(self):
         """
-            computes the generalised Green-Kubo's diffusion constant
+            Computes the generalised Green-Kubo's diffusion constant
+
+            :return diffusivity: diffusion constant obtained by the Gree-Kubo relation 
         """
         
         self.velocity_()
         self.diffusivity = 0.
-        N = len(self._velocity)
+        N = len(self.velocity)
         dt = self._t[1] - self._t[0]
 
         for tau in range(1, N-1):
             self.diffusivity += self._stationary_velocity_correlation(tau) * dt/3
 
         return self.diffusivity
+    
+    @staticmethod
+    def velocity_description_(velocity):     
+        """
+            Computes the main features of the velocity distribuition: mean, median, mode, variance,
+            standard deviation, range, skewness and kurtosis
+        
+            return velocity_description_: returns a dictionary where the values are bounded 
+            to a key of the same name
+        """
+        mean = np.mean(velocity,axis=0)  
+        median = np.median(velocity,axis=0)
+        standard_deviation = np.std(velocity,axis=0) 
+        variance = np.var(velocity,axis=0)
+        ran = np.abs(np.max(velocity,axis=0) - np.min(velocity,axis=0))
+        skewness = (sum((velocity[:,:]-mean)**3)/len(velocity))/((sum((velocity[:,:]-mean)**2)/len(velocity))**1.5)
+        kurtosis = (sum((velocity[:,:]-mean)**4)/len(velocity))/(standard_deviation**4) - 3
+        mode = np.empty(velocity.shape[1],dtype=object) 
+        for col in range(velocity.shape[1]):
+            vel_values, vel_freq = np.unique(np.round(velocity[:,col],3), return_counts=True,axis=0)
+        if max(vel_freq)==1:
+            mode[col] = 'no mode'
+        else:
+            mode[col] = vel_values[np.where(vel_freq==max(vel_freq))]
+        
+        velocity_description = {'mean':mean,
+                'median':median,
+                'mode':mode,
+                'standard_deviation':standard_deviation,
+                'variance':variance,
+                'range':ran,
+                'kurtosis':kurtosis,
+                'skewness':skewness}
+        return velocity_description
+    
+    @staticmethod
+    def frequency_spectrum_(position,t): 
+        """
+            Computes the Fourier Transform of the trajectory and calculates the dominant frequency,
+            dominant amplitude, main frequencies (given a threshold of 1 Hz), the corresponing
+            amplitudes and mean frequency
+
+            return frequency_spectrum: returns a dictionary where the values are bounded 
+            to a key of the same name
+        """   
+        dt = t[1] - t[0]
+        n = len(t)
+        yvalues = position
+        xvalues = range(len(yvalues))
+        yvalues_detrended = np.zeros(shape=yvalues.shape)
+        for col in range(yvalues.shape[1]):
+            z1 = np.polyfit(xvalues, yvalues[:,col], deg=1)
+            p1 = np.poly1d(z1)
+            yvalues_detrended[:,col] = yvalues[:,col] - p1(xvalues) 
+        fourier = np.fft.fft(yvalues_detrended,axis=0,n=n) 
+        limite = np.arange(1,np.floor(n/2),dtype='int') 
+        poder = 2*np.abs(fourier)/n 
+        poder = poder[1:max(limite),:] 
+        f = (1/(dt*n))*np.arange(n) 
+        f = f[1:max(limite)] 
+        dominant_frequency = f[np.argmax(poder[:max(limite)],axis=0)] 
+        dominant_amp = np.max(poder[:max(limite)],axis=0) 
+        main_frequencies = np.empty(shape=yvalues_detrended.shape[1],dtype=object) 
+        main_amplitudes = np.empty(shape=yvalues_detrended.shape[1],dtype=object)
+        mean_frequency = np.zeros(yvalues_detrended.shape[1])
+        for col in range(yvalues_detrended.shape[1]):
+            indice = np.where(poder[:,col]>=1)
+            main_amplitudes[col] = poder[indice,col] 
+            main_frequencies[col] = f[indice] 
+            mean_frequency[col] = np.mean(indice) 
+        frequency_spectrum = {'dominant frequency':dominant_frequency,
+                            'dominant amplitude':dominant_amp,
+                            'mean frequency':mean_frequency,
+                            'main frequencies':main_frequencies,
+                            'main amplitudes':main_amplitudes,
+                            'x':f,
+                            'y':poder}
+        return frequency_spectrum
