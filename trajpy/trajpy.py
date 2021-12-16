@@ -1,8 +1,5 @@
-#from _typeshed import Self
-#from os import stat
 import numpy as np
 from scipy.stats import linregress
-from scipy.integrate import cumtrapz
 import trajpy.auxiliar_functions as aux
 import warnings
 
