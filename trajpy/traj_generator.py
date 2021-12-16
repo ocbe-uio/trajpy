@@ -164,7 +164,6 @@ def save_to_file(y, param, path):
     :param param: a parameter that characterizes the kind of trajectory
     :param path: path to the folder where the file will be saved
     """
-
-    for n in range(0, len(y[:, 0])):
-        np.savetxt(path + '/traj' + str(np.round(param, decimals=1)) + str(n) + '.csv', y[:, n],
-                   delimiter=',', header='m')
+    dims = ['x','y']
+    np.savetxt(path + '/traj_' + str(param) + '.csv',y,delimiter=',',
+      header='t,'+(",".join(dims[:y.shape[1]]*int((y.shape[1])/2))),comments='')
