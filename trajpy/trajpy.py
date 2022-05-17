@@ -241,7 +241,8 @@ class Trajectory(object):
         where :math:`N` is the number of segments of the trajectory, :math:`\\mathbf{r}_i` is the :math:`i`-th position vector along the trajectory,
         :math:`m` and :math:`n` assume the values of the corresponding coordinates along the directions :math:`x, y, z`.
 
-        :return gyration_radius: tensor
+        :return gyration_radius: gyration_radius dictionary containing the tensor, eigenvalues in descending order
+        and the corresponding eigenvectors by column
         """
 
         dim = trajectory.shape[1]  # number of dimensions
@@ -253,9 +254,16 @@ class Trajectory(object):
                 r_gyr[m, n] = np.sum(np.matmul(trajectory[:, m] - r_mean[m],
                                                trajectory[:, n] - r_mean[n]))
 
-        gyration_radius = np.sqrt(np.abs(r_gyr/trajectory.size))
-
-        return gyration_radius
+        g_radius = np.sqrt(np.abs(r_gyr/trajectory.size)) #gyration radius tensor
+        
+        eigenvalues,eigenvectors = np.linalg.eig(g_radius) #computes the eigenvalues and eigenvectors
+        id = eigenvalues.argsort()[::-1] 
+        eigenvalues = eigenvalues[id] #eigenvalues in descending order
+        eigenvectors = eigenvectors[:,id] #eigenvectors corresponding to the descending order
+        gyration_radius = {'gyration tensor':g_radius,
+                            'eigenvalues':eigenvalues,
+                            'eigenvectors':eigenvectors} 
+        return gyration_radius #dictionary
 
     @staticmethod
     def asymmetry_(eigenvalues):
@@ -422,14 +430,11 @@ class Trajectory(object):
     def _stationary_velocity_correlation(self, taus):
         """
             Computes the stationary velocity autocorrelation function by time average
-
             .. math:
                 \\langle \\vec{v(t+\\tau)} \\vec{v(t)} \\rangle
-        
         :param taus: single or array of non-negative integer values representing the time lag
         :return time_averaged_corr_velocity: velocity autocorrelation function output
         """
-
         time_averaged_corr_velocity = np.zeros(len(taus))
         N = len(self.velocity)
         for tau in taus:
@@ -443,27 +448,24 @@ class Trajectory(object):
     def green_kubo_(self):
         """
             Computes the generalised Green-Kubo's diffusion constant
-
             :return diffusivity: diffusion constant obtained by the Gree-Kubo relation 
         """
-        
         self.velocity_()
         self.diffusivity = 0.
         N = len(self.velocity)
         dt = self._t[1] - self._t[0]
-
         for tau in range(1, N-1):
             self.diffusivity += self._stationary_velocity_correlation(tau) * dt/3
-
         return self.diffusivity
     
     @staticmethod
-    def velocity_description_(velocity):     
+    def velocity_description_(velocity):
         """
             Computes the main features of the velocity distribuition: mean, median, mode, variance,
             standard deviation, range, skewness and kurtosis
-        
-            return velocity_description_: returns a dictionary where the values are bounded 
+
+            :param velocity: velocity array
+            return velocity_description: returns a dictionary where the values are bounded 
             to a key of the same name
         """
         mean = np.mean(velocity,axis=0)  
@@ -494,13 +496,12 @@ class Trajectory(object):
     @staticmethod
     def frequency_spectrum_(position,t): 
         """
-            Computes the Fourier Transform of the trajectory and calculates the dominant frequency,
-            dominant amplitude, main frequencies (given a threshold of 1 Hz), the corresponing
-            amplitudes and mean frequency
-
-            return frequency_spectrum: returns a dictionary where the values are bounded 
-            to a key of the same name
-        """   
+        Computes the Frequency Spectrum using the Fast Fourier Transform algorithm
+        param position: spatial coordinates
+        param t: time
+        return frequency_spectrum_:returns a dictionary containing the dominant frequency and the amplitude associated with it,
+        the mean and main frequencies, the main amplitude and two arrays - one contains the frequencies and the other the amplitudes.
+        """
         dt = t[1] - t[0]
         n = len(t)
         yvalues = position
@@ -511,19 +512,19 @@ class Trajectory(object):
             p1 = np.poly1d(z1)
             yvalues_detrended[:,col] = yvalues[:,col] - p1(xvalues) 
         fourier = np.fft.fft(yvalues_detrended,axis=0,n=n) 
-        limite = np.arange(1,np.floor(n/2),dtype='int') 
-        poder = 2*np.abs(fourier)/n 
-        poder = poder[1:max(limite),:] 
+        limit = np.arange(1,np.floor(n/2),dtype='int') 
+        power = 2*np.abs(fourier)/n 
+        power = power[1:max(limit),:] 
         f = (1/(dt*n))*np.arange(n) 
-        f = f[1:max(limite)] 
-        dominant_frequency = f[np.argmax(poder[:max(limite)],axis=0)] 
-        dominant_amp = np.max(poder[:max(limite)],axis=0) 
+        f = f[1:max(limit)] 
+        dominant_frequency = f[np.argmax(power[:max(limit)],axis=0)] 
+        dominant_amp = np.max(power[:max(limit)],axis=0) 
         main_frequencies = np.empty(shape=yvalues_detrended.shape[1],dtype=object) 
         main_amplitudes = np.empty(shape=yvalues_detrended.shape[1],dtype=object)
         mean_frequency = np.zeros(yvalues_detrended.shape[1])
         for col in range(yvalues_detrended.shape[1]):
-            indice = np.where(poder[:,col]>=1)
-            main_amplitudes[col] = poder[indice,col] 
+            indice = np.where(power[:,col]>=1)
+            main_amplitudes[col] = power[indice,col] 
             main_frequencies[col] = f[indice] 
             mean_frequency[col] = np.mean(indice) 
         frequency_spectrum = {'dominant frequency':dominant_frequency,
@@ -532,5 +533,5 @@ class Trajectory(object):
                             'main frequencies':main_frequencies,
                             'main amplitudes':main_amplitudes,
                             'x':f,
-                            'y':poder}
+                            'y':power}
         return frequency_spectrum
