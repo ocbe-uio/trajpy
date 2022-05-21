@@ -2,33 +2,14 @@ import cv2 # Import the OpenCV library
 import numpy as np # Import Numpy library
 #import tamanho
 
-def captura(file_name,number):
-	cap = cv2.VideoCapture(0)
+def captura(camera,file_name,number1,number2):
+	cap = cv2.VideoCapture(camera)
 	#cap = cv2.VideoCapture('Projeto sem Título.mp4')
 	height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 	width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 	fps = cap.get(cv2.CAP_PROP_FPS)
-	#############################################
-	'''
-	result, image = cap.read()
-	if result:
-
-		# showing result, it take frame name and image 
-		# output
-		cv2.imshow("Photo_sample", image)
-
-		# saving image in local storage
-		#cv2.imwrite("sample_photo.png", image)
-		bbox = cv2.selectROI(image, False)
-		# If keyboard interrupt occurs, destroy image 
-		# window
-		cv2.waitKey(1) #press enter to continue
-		cv2.destroyWindow("Photo_sample")
-		'''
-#######################################################3
-
-	#px_per_cm = tamanho.size(cap)/10
-	#salvar = cv2.VideoWriter('teste_live.avi',cv2.VideoWriter_fourcc('P','I','M','1'), fps, (width, height), isColor=True)
+	
+	salvar = cv2.VideoWriter(str(file_name)+'.mp4',cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height), isColor=True)
 	# Create the background subtractor object
 	# Use the last 700 video frames to build the background
 	back_sub = cv2.createBackgroundSubtractorKNN()
@@ -37,7 +18,7 @@ def captura(file_name,number):
 	# Create kernel for morphological operation
 	# You can tweak the dimensions of the kernel
 	# e.g. instead of 20,20 you can try 30,30.
-	kernel = np.ones((20,20),np.uint8)
+	kernel = np.ones((30,30),np.uint8)
 	arquivo = open(str(file_name)+'.txt','w') #arquivo externo
 	numero_frames = 0
 	while(True):
@@ -95,22 +76,25 @@ def captura(file_name,number):
 		#fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer);
 
 		#px_per_cm = bbox[2]/float(number)
-		px_per_cm = w/float(number)
+		if w > h:
+			px_per_cm = w/float(number1)
+		elif w < h:
+			px_per_cm = h/float(number1)
 		# Draw circle in the center of the bounding box
 		x2 = x + int(w/2)
 		y2 = y + int(h/2)
-		if numero_frames%5 == 0:
-			arquivo.write(str(np.round(numero_frames/fps,2))+','+str(np.round(x2/px_per_cm,2))+','
-			+str(np.round(y2/px_per_cm,2))+'\n') 
+		if numero_frames%5 == 0 and numero_frames/fps > 1.0:
+			arquivo.write(str(np.round(numero_frames/fps,2))+','+str(np.round(x2/px_per_cm,1))+','+str(np.round(y2/px_per_cm,1))+'\n') 			
+		
 		cv2.circle(frame,(x2,y2),4,(0,255,0),-1)
 
 		# Print the centroid coordinates (we'll use the center of the
 		# bounding box) on the image
-		text = "x: " + str(np.round(x2/px_per_cm,2)) + ", y: " + str(np.round(y2/px_per_cm,2)) 
+		text = "x: " + str(np.round(x2/px_per_cm,1)) + ", y: " + str(np.round(y2/px_per_cm,1)) 
 		cv2.putText(frame, text, (300, 400), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0 ,255), 2)
 		
-		#w_text = 'Width:' + str(w)
-		#cv2.putText(frame, w_text, (300, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
+		w_text = 'w: ' + str(w) + ' h: ' + str(h)
+		cv2.putText(frame, w_text, (300, 300), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)
 		
 		
 		fps_text = 'Tempo = ' + str(np.round(numero_frames/fps,2))
@@ -120,7 +104,7 @@ def captura(file_name,number):
 		cv2.putText(frame,stop_text,(120,120),cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,0,255), 2)
 
 		# Display the resulting frame
-		#salvar.write(frame)
+		salvar.write(frame)
 		cv2.imshow('frame',frame)
 		#cv2.imwrite('frame'+str(numero_frames)+'.jpg',frame)
 		
@@ -134,7 +118,7 @@ def captura(file_name,number):
 	cap.release()
 	cv2.destroyAllWindows()
 	arquivo.close()
-	#salvar.release()
+	salvar.release()
 	
 if __name__ == '__main__':
     captura()

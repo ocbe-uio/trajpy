@@ -4,17 +4,45 @@ import animals
 import live_tracking
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+from matplotlib.colors import LinearSegmentedColormap
+from matplotlib import cm
+
 
 root = Tk()
 root.title('TrajPy animals GUI')
-root.geometry('400x400')
+root.geometry('450x350')
 root.resizable(False, False)
+
+
+
 
 results = []
 features = []
 
 def track_function():
-    live_tracking.captura(file_entry.get(),number_entry.get())
+    global file_variables
+    number_variables = number_entry.get().split(',')
+    file_variables = file_entry.get().split(',')
+    live_tracking.captura(int(file_variables[0]),file_variables[1],float(number_variables[0]),float(number_variables[1]))
+
+def test_function():
+    global file_variables
+    import cv2
+    file_variables = file_entry.get().split(',')
+    cap = cv2.VideoCapture(int(file_variables[0]))
+    while(True):
+        ret, frame = cap.read()
+        if not ret:
+            break
+        stop_text = 'Press "q" to stop'
+        cv2.putText(frame,stop_text,(50,50),cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,0,255), 2)
+        cv2.imshow('frame',frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+
 
 def open_function():
    root.filename = filedialog.askopenfilename(parent=root,
@@ -42,17 +70,17 @@ def add_var3():
 def compute_function():
     global label1
     if "Displacement" in features:
-        results.append(animals.displacement(root.filename))
+        results.append(animals.displacement(root.filename) + 'cm')
     if 'Center' in features:
         center_variables = center_entry.get().split(',')
         results.append(animals.time_center(float(center_variables[0]),float(center_variables[1]),float(center_variables[2])
-        ,float(center_variables[3]),root.filename))
+        ,float(center_variables[3]),root.filename) + 's')
     if 'Edges' in features:
         edges_variables = edges_entry.get().split(',')
         results.append(animals.time_edges(float(edges_variables[0]),float(edges_variables[1]),float(edges_variables[2])
-        ,float(edges_variables[3]),root.filename))
-    label1 = Label(root,text=','.join(results),font=('Helvetica 12 bold'),background='white')
-    label1.place(x=10,y=240)
+        ,float(edges_variables[3]),root.filename) + 's')
+    label1 = Label(root,text=', '.join(results),font=('Helvetica 16'),background='white')
+    label1.place(x=12,y=300)
 
 def clear_function():
     results.clear()
@@ -63,78 +91,116 @@ def plot_function():
     data = np.loadtxt(root.filename,delimiter=',')
     x = data[:,1]
     y = data[:,2]
-    r = np.sqrt(np.sum(data[:,1:]**2,axis=1))
-    time = data[:,0]
-    plt.figure(figsize=(8,5),dpi=150)
+    #r = np.sqrt(np.sum(data[:,1:]**2,axis=1))
+    time = data[:,0]/60.0
+    #def colorlist2(c1, c2, num):
+    #    l = np.linspace(0,1,num)
+    #    a = np.abs(np.array(c1)-np.array(c2))
+    #    m = np.min([c1,c2], axis=0)
+    #    s  = np.sign(np.array(c2)-np.array(c1)).astype(int)
+    #    s[s==0] =1
+    #    r = np.sqrt(np.c_[(l*a[0]+m[0])[::s[0]],(l*a[1]+m[1])[::s[1]],(l*a[2]+m[2])[::s[2]]])
+    #    return r
+    plt.figure(figsize=(6,5),dpi=150)
     plt.subplot(121)
-    cm = plt.cm.get_cmap('viridis')
-    sc = plt.scatter(x,y,c=time,vmin=min(time), vmax=max(time+5), s=35, cmap=cm)
+    #plt.scatter(x[0],y[0],color='red',s=100)
+    #plt.scatter(x[-1],y[-1],color='black',s=100)
+    #cmap = LinearSegmentedColormap.from_list("", colorlist2((1,0.5,0), (0, 0.5, 0.5),100))
+    #f2 = interp1d(x, y, kind='cubic')
+    points = np.array([x, y]).T.reshape(-1,1,2)
+    segments = np.concatenate([points[:-2],points[1:-1], points[2:]], axis=1)
+    lc = LineCollection(segments, cmap=cm.viridis, linewidth=2)
+    lc.set_array(time)
+    plt.gca().add_collection(lc)
+    plt.gca().autoscale()
+    cbar = plt.colorbar(lc,orientation="horizontal")
+    cbar.set_label(r'$t~$[min]',fontsize=12)
+    plt.xlabel(r'$x~$[cm]',fontsize=12)
+    plt.ylabel(r'$y~$[cm]',fontsize=12)
+    
+
+    plt.subplot(122)
+    plt.hist2d(x, y, bins=25,cmap='Blues')
+    plt.xlabel(r'$x~$[cm]',fontsize=12)
+    plt.ylabel(r'$y~$[cm]',fontsize=12)
+    cb = plt.colorbar(orientation="horizontal")
+    cb.set_label('# of occurrences')
+    plt.tight_layout()
+    plt.show()
+    
+    '''
+    plt.figure(figsize=(6,5),dpi=150)
+    plt.subplot(121)
+    cm = plt.cm.get_cmap('YlGnBu')
+    sc = plt.scatter(x,y,c=time,vmin=min(time), vmax=max(time), s=35, cmap=cm,edgecolors='black')
     cbar = plt.colorbar(sc)
-    cbar.set_label(r'$t~$[s]',fontsize=12)
+    cbar.set_label(r'$t~$[min]',fontsize=12)
     plt.xlabel(r'$x~$[cm]',fontsize=12)
     plt.ylabel(r'$y~$[cm]',fontsize=12)
     plt.subplot(122)
-    plt.hist2d(x, y, bins=50,cmap='plasma')
+    plt.hist2d(x, y, bins=25,cmap='Blues')
     plt.xlabel(r'$x~$[cm]',fontsize=12)
     plt.ylabel(r'$y~$[cm]',fontsize=12)
     cb = plt.colorbar()
     cb.set_label('# of occurrences')
-    plt.tight_layout()
+    #plt.tight_layout()
     plt.show()
+    '''
 
 
-
-title_label = Label(root, text="TrajPy", font=("Arial Bold", 28))
-title_label.place(x=160,y=10)
+title_label = Label(root, text="TrajPy", font=("Arial Bold", 35))
+title_label.place(x=160,y=0)
 version_label = Label(root, text="Animal Tracking", font=("Arial Bold", 10))
-version_label.place(x=165,y=50)
+version_label.place(x=175,y=50)
 
-track_button = Button(root,text='Track!',command=track_function)
-track_button.place(x=30,y=70)
+track_button = Button(root,text='Track!',command=track_function,font=('Arial',20))
+track_button.place(x=10,y=70)
 
-open_button = Button(root,text='Open File',command=open_function)
-open_button.place(x=100,y=70)
+open_button = Button(root,text='Open File',command=open_function,font=('Arial',20))
+open_button.place(x=260,y=70)
 
-file_entry = Entry(root,width=30)
-file_entry.insert(0,'Insert file name')
-file_entry.place(x=10,y=100)
+file_entry = Entry(root,width=28,font=('Arial',12))
+file_entry.insert(0,'Insert cam code(int),file name')
+file_entry.place(x=10,y=120)
 
-number_entry = Entry(root,width=30)
-number_entry.place(x=10,y=120)
-number_entry.insert(0,'Insert object size')
+number_entry = Entry(root,width=28,font=('Arial',12))
+number_entry.place(x=10,y=150)
+number_entry.insert(0,"Insert object's width,height")
 
-center_entry = Entry(root,width=30)
-center_entry.place(x=10,y=140)
-center_entry.insert(0,'Insert center coordinates')
+center_entry = Entry(root,width=28,font=('Arial',12))
+center_entry.place(x=10,y=180)
+center_entry.insert(0,'Insert site coordinates (x1,x2,y1,y2)')
 
-
-edges_entry = Entry(root,width=30)
-edges_entry.place(x=10,y=160)
-edges_entry.insert(0,'Insert edges coordinates')
+edges_entry = Entry(root,width=28,font=('Arial',12))
+edges_entry.place(x=10,y=210)
+edges_entry.insert(0,"Insert site edges (x1,x2,y1,y2)")
 
 var1 = StringVar()
 var2 = StringVar()
 var3 = StringVar()
 
-box1 = Checkbutton(root,text='Displacement',variable=var1,onvalue='On',offvalue='Off',command=add_var1)
+box1 = Checkbutton(root,text='Displacement',variable=var1,onvalue='On',offvalue='Off',command=add_var1,font=('Arial',16))
 box1.deselect()
-box1.place(x=200,y=100)
+box1.place(x=270,y=120)
 
-box2 = Checkbutton(root,text='Time at Center',variable=var2,onvalue='On',offvalue='Off',command=add_var2)
+box2 = Checkbutton(root,text='Time on site',variable=var2,onvalue='On',offvalue='Off',command=add_var2,font=('Arial',16))
 box2.deselect()
-box2.place(x=200,y=120)
+box2.place(x=270,y=160)
 
-box3 = Checkbutton(root,text='Time at Edges',variable=var3,onvalue='On',offvalue='Off',command=add_var3)
+box3 = Checkbutton(root,text='Time ouside site',variable=var3,onvalue='On',offvalue='Off',command=add_var3,font=('Arial',16))
 box3.deselect()
-box3.place(x=200,y=140)
+box3.place(x=270,y=200)
 
-compute_button = Button(root,text='Compute',command=compute_function)
-compute_button.place(x=10,y=210)
+compute_button = Button(root,text='Compute',command=compute_function,font=('Arial',20))
+compute_button.place(x=10,y=250)
 
-clear_button = Button(root,text='Clear',command=clear_function)
-clear_button.place(x=90,y=210)
+clear_button = Button(root,text='Clear',command=clear_function,font=('Arial',20))
+clear_button.place(x=185,y=250)
 
-plot_button = Button(root,text='Plot',command=plot_function)
-plot_button.place(x=150,y=210)
+plot_button = Button(root,text='Plot',command=plot_function,font=('Arial',20))
+plot_button.place(x=310,y=250)
+
+test_button = Button(root,text='Cam test',command=test_function,font=('Arial',20))
+test_button.place(x=120,y=70)
 
 root.mainloop()
