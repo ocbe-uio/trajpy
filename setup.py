@@ -14,5 +14,6 @@ setup(
     platform='Python 3.7',
     packages=find_packages(),
     install_requires=['numpy >= 1.14.3',
-                      'scipy == 1.5.4'],
+                      'scipy == 1.7.1', #1.5.4
+                      'opencv-contrib-python == 4.5.5.62'],
 )

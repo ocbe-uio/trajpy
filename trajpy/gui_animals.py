@@ -8,10 +8,9 @@ from matplotlib.collections import LineCollection
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib import cm
 
-
 root = Tk()
 root.title('TrajPy animals GUI')
-root.geometry('450x350')
+root.geometry('470x350')
 root.resizable(False, False)
 
 
@@ -91,25 +90,12 @@ def plot_function():
     data = np.loadtxt(root.filename,delimiter=',')
     x = data[:,1]
     y = data[:,2]
-    #r = np.sqrt(np.sum(data[:,1:]**2,axis=1))
     time = data[:,0]/60.0
-    #def colorlist2(c1, c2, num):
-    #    l = np.linspace(0,1,num)
-    #    a = np.abs(np.array(c1)-np.array(c2))
-    #    m = np.min([c1,c2], axis=0)
-    #    s  = np.sign(np.array(c2)-np.array(c1)).astype(int)
-    #    s[s==0] =1
-    #    r = np.sqrt(np.c_[(l*a[0]+m[0])[::s[0]],(l*a[1]+m[1])[::s[1]],(l*a[2]+m[2])[::s[2]]])
-    #    return r
-    plt.figure(figsize=(6,5),dpi=150)
+    plt.figure(dpi=150)
     plt.subplot(121)
-    #plt.scatter(x[0],y[0],color='red',s=100)
-    #plt.scatter(x[-1],y[-1],color='black',s=100)
-    #cmap = LinearSegmentedColormap.from_list("", colorlist2((1,0.5,0), (0, 0.5, 0.5),100))
-    #f2 = interp1d(x, y, kind='cubic')
     points = np.array([x, y]).T.reshape(-1,1,2)
     segments = np.concatenate([points[:-2],points[1:-1], points[2:]], axis=1)
-    lc = LineCollection(segments, cmap=cm.viridis, linewidth=2)
+    lc = LineCollection(segments, cmap=cm.viridis, linewidth=3)
     lc.set_array(time)
     plt.gca().add_collection(lc)
     plt.gca().autoscale()
@@ -124,28 +110,10 @@ def plot_function():
     plt.xlabel(r'$x~$[cm]',fontsize=12)
     plt.ylabel(r'$y~$[cm]',fontsize=12)
     cb = plt.colorbar(orientation="horizontal")
-    cb.set_label('# of occurrences')
+    cb.set_label('Number of occurrences')
     plt.tight_layout()
     plt.show()
     
-    '''
-    plt.figure(figsize=(6,5),dpi=150)
-    plt.subplot(121)
-    cm = plt.cm.get_cmap('YlGnBu')
-    sc = plt.scatter(x,y,c=time,vmin=min(time), vmax=max(time), s=35, cmap=cm,edgecolors='black')
-    cbar = plt.colorbar(sc)
-    cbar.set_label(r'$t~$[min]',fontsize=12)
-    plt.xlabel(r'$x~$[cm]',fontsize=12)
-    plt.ylabel(r'$y~$[cm]',fontsize=12)
-    plt.subplot(122)
-    plt.hist2d(x, y, bins=25,cmap='Blues')
-    plt.xlabel(r'$x~$[cm]',fontsize=12)
-    plt.ylabel(r'$y~$[cm]',fontsize=12)
-    cb = plt.colorbar()
-    cb.set_label('# of occurrences')
-    #plt.tight_layout()
-    plt.show()
-    '''
 
 
 title_label = Label(root, text="TrajPy", font=("Arial Bold", 35))

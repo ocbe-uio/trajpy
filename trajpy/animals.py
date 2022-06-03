@@ -1,5 +1,5 @@
 import numpy as np
-#displacement in 2D, time at the center, time at the edges
+
 
 
 def displacement(file):
@@ -22,16 +22,16 @@ def time_edges(x1,x2,y1,y2,file):
 
     te = 0
     for i in range(file.shape[0]-1):
-        if (file[i,1] < x1 or file[i,1] > x2): #xatual fora por causa de x
-            if (file[i+1,1] < x1 or file[i+1,1] > x2): #xproximo fora por causa de x
+        if (file[i,1] < x1 or file[i,1] > x2): 
+            if (file[i+1,1] < x1 or file[i+1,1] > x2): 
                 te += file[i+1,0] - file[i,0]
-            elif (file[i+1,1] > x1 and file[i+1,1] < x2) and (file[i+1,2] < y1 or file[i+1,2] > y2): #xproximo fora por causa de 'x dentro mas y fora'
+            elif (file[i+1,1] > x1 and file[i+1,1] < x2) and (file[i+1,2] < y1 or file[i+1,2] > y2): 
                 te += file[i+1,0] - file[i,0]
 
-        elif (file[i,1] > x1 and file[i,1] < x2) and (file[i,2] < y1 or file[i,2] > y2): #xatual fora por causa de 'x dentro mas y fora'
-            if (file[i+1,1] < x1 or file[i+1,1] > x2): #xproximo fora por causa de x
+        elif (file[i,1] > x1 and file[i,1] < x2) and (file[i,2] < y1 or file[i,2] > y2): 
+            if (file[i+1,1] < x1 or file[i+1,1] > x2): 
                 te += file[i+1,0] - file[i,0]
-            elif (file[i+1,1] > x1 and file[i+1,1] < x2) and (file[i+1,2] < y1 or file[i+1,2] > y2): #xproximo fora por causa de 'x dentro mas y fora'
+            elif (file[i+1,1] > x1 and file[i+1,1] < x2) and (file[i+1,2] < y1 or file[i+1,2] > y2): 
                 te += file[i+1,0] - file[i,0]
     return str(np.round(te,2))
 
