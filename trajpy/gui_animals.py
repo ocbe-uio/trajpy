@@ -45,7 +45,7 @@ def test_function():
 
 def open_function():
    root.filename = filedialog.askopenfilename(parent=root,
-   initialdir='/home/secundario/Documentos/mestrado/projeto/code testing/data'
+   initialdir='/'
    ,title='Please select a file')
 
 def add_var1():
