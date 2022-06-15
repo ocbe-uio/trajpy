@@ -43,6 +43,8 @@ class Trajectory(object):
         self.fractal_dimension = None
         self.eigenvalues = None
         self.gyration_radius = None
+        self.eigenvalues = None
+        self.eigenvectors = None
         self.asymmetry = None
         self.straightness = None
         self.anisotropy = None
@@ -63,30 +65,34 @@ class Trajectory(object):
 
         :return features: return the values of the features as a string.
         """
-        self.msd_ta = self.msd_time_averaged(self._r,
-                                             np.arange(len(self._r)))
+        self.msd_ta = self.msd_time_averaged(self._r,np.arange(len(self._r)))
         self.msd_ea = self.msd_ensemble_averaged(self._r)
         self.msd_ratio = self.msd_ratio_(self.msd_ta, n1=2, n2=10)
         self.anomalous_exponent = self.anomalous_exponent_(self.msd_ea, self._t)
         self.fractal_dimension, self._r0 = self.fractal_dimension_(self._r)
 
-        self.gyration_radius = self.gyration_radius_(self._r)
-        self.eigenvalues, self.eigenvectors = np.linalg.eig(self.gyration_radius)
-        self.eigenvalues[::-1].sort()  # the eigenvalues must be in the descending order
-        self._idx = self.eigenvalues.argsort()[::-1]  # getting the position of the principal eigenvector
-        self.kurtosis = self.kurtosis_(self._r, self.eigenvectors[self._idx[0]])
-        self.anisotropy = self.anisotropy_(self.eigenvalues)
+        self.gyration_radius = list(self.gyration_radius_(self._r).values())[0]
+        self.eigenvalues, self.eigenvectors = list(self.gyration_radius_(self._r).values())[1],list(self.gyration_radius_(self._r).values())[2]
+        #self.eigenvalues[::-1].sort()  # the eigenvalues must be in the descending order
+        #self._idx = self.eigenvalues.argsort()[::-1]  # getting the position of the principal eigenvector
 
+        self.kurtosis = self.kurtosis_(self._r, self.eigenvectors[:,0])
+        self.anisotropy = self.anisotropy_(self.eigenvalues)
+        self.velocity = self.velocity_(self._r,self._t)
+        self.vacf = self.stationary_velocity_correlation_(self.velocity,self._t,np.arange(int(len(self.velocity)/2)))
         self.straightness = self.straightness_(self._r)
         self.gaussianity = self.gaussianity_(self._r)
         self.efficiency = self.efficiency_(self._r)
-        self.diffusivity = self.green_kubo_()
+        self.diffusivity = self.green_kubo_(self.velocity,self._t,
+                            self.stationary_velocity_correlation_(self.velocity,self._t,np.arange(int(len(self.velocity)/2))))
         self.velocity_description = self.velocity_description_(self.velocity)
-        self.frequency_spectrum = self.frequency_spectrum_(self._r,self.t)
+        self.frequency_spectrum = self.frequency_spectrum_(self._r,self._t)
+
         #self.confinement_probability = self.confinement_probability_(2,self.diffusivity, self._t[-1])
 
-        #(str(np.round(self.anomalous_exponent, 4)) + ',' +
-        features = (str(np.round(self.msd_ratio, 4)) + ',' +
+        
+        features = (str(np.round(self.anomalous_exponent, 4)) + ',' +
+                    str(np.round(self.msd_ratio, 4)) + ',' +
                     str(np.round(self.fractal_dimension, 4)) + ',' +
                     str(np.round(self.anisotropy, 4)) + ',' +
                     str(np.round(self.kurtosis, 4)) + ',' +
@@ -229,7 +235,7 @@ class Trajectory(object):
                                      + np.log(d_max * np.power(length, -1))), decimals=2)
 
         return fractal_dimension, d_max
-
+    
     @staticmethod
     def gyration_radius_(trajectory):
         """
@@ -241,7 +247,8 @@ class Trajectory(object):
         where :math:`N` is the number of segments of the trajectory, :math:`\\mathbf{r}_i` is the :math:`i`-th position vector along the trajectory,
         :math:`m` and :math:`n` assume the values of the corresponding coordinates along the directions :math:`x, y, z`.
 
-        :return gyration_radius: tensor
+        :return gyration_radius: gyration_radius dictionary containing the tensor, eigenvalues in descending order
+        and the corresponding eigenvectors by column
         """
 
         dim = trajectory.shape[1]  # number of dimensions
@@ -253,9 +260,16 @@ class Trajectory(object):
                 r_gyr[m, n] = np.sum(np.matmul(trajectory[:, m] - r_mean[m],
                                                trajectory[:, n] - r_mean[n]))
 
-        gyration_radius = np.sqrt(np.abs(r_gyr/trajectory.size))
-
-        return gyration_radius
+        g_radius = np.sqrt(np.abs(r_gyr/trajectory.size)) #gyration radius tensor
+        
+        eigenvalues,eigenvectors = np.linalg.eig(g_radius) #computes the eigenvalues and eigenvectors
+        id = eigenvalues.argsort()[::-1] 
+        eigenvalues = eigenvalues[id] #eigenvalues in descending order
+        eigenvectors = eigenvectors[:,id] #eigenvectors corresponding to the descending order
+        gyration_radius = {'gyration tensor':g_radius,
+                            'eigenvalues':eigenvalues,
+                            'eigenvectors':eigenvectors} 
+        return gyration_radius #dictionary 
 
     @staticmethod
     def asymmetry_(eigenvalues):
@@ -290,8 +304,10 @@ class Trajectory(object):
 
         """
         
-        eigenvalues[::-1].sort() # the eigen values must the in the descending order
+        eigenvalues[::-1].sort() # the eigenvalues must the in the descending order
         
+        if len(eigenvalues) == 2:
+            eigenvalues =  np.concatenate((eigenvalues,np.array([0.0])),axis=0)
         anisotropy = 1. - 3. * ((eigenvalues[0] * eigenvalues[1]
                                 + eigenvalues[1] * eigenvalues[2]
                                 + eigenvalues[2] * eigenvalues[0])
@@ -418,52 +434,48 @@ class Trajectory(object):
 
         return velocity
 
-    
-    def _stationary_velocity_correlation(self, taus):
+    @staticmethod
+    def stationary_velocity_correlation_(velocity,t,taus):
         """
             Computes the stationary velocity autocorrelation function by time average
-
             .. math:
                 \\langle \\vec{v(t+\\tau)} \\vec{v(t)} \\rangle
-        
+        :param velocity: velocity array
+        :param t: time array
         :param taus: single or array of non-negative integer values representing the time lag
         :return time_averaged_corr_velocity: velocity autocorrelation function output
         """
-
         time_averaged_corr_velocity = np.zeros(len(taus))
-        N = len(self.velocity)
+        N = len(velocity)
         for tau in taus:
             time_averaged_corr_velocity[tau] = (np.sum(np.einsum('ij,ij->i',
-                np.take(a=self.velocity,indices=np.arange(0,N-tau)+tau,axis=0),
-                np.take(a=self.velocity,indices=np.arange(0,N-tau),axis=0)))+ 
-                time_averaged_corr_velocity[tau-1])*(self._t[1]-self._t[0]) / (N-tau)
+                np.take(a=velocity,indices=np.arange(0,N-tau)+tau,axis=0),
+                np.take(a=velocity,indices=np.arange(0,N-tau),axis=0)))+ 
+                time_averaged_corr_velocity[tau-1])*(t[1]-t[0]) / (N-tau)
         return time_averaged_corr_velocity
 
-    
-    def green_kubo_(self):
+    @staticmethod
+    def green_kubo_(velocity,t,vacf):
         """
             Computes the generalised Green-Kubo's diffusion constant
-
-            :return diffusivity: diffusion constant obtained by the Gree-Kubo relation 
+            :return diffusivity: diffusion constant obtained by the Green-Kubo relation 
         """
         
-        self.velocity_()
-        self.diffusivity = 0.
-        N = len(self.velocity)
-        dt = self._t[1] - self._t[0]
-
-        for tau in range(1, N-1):
-            self.diffusivity += self._stationary_velocity_correlation(tau) * dt/3
-
-        return self.diffusivity
+        diffusivity = 0.
+        N = len(velocity)
+        dt = t[1] - t[0]
+        #for tau in range(1, N-1):
+        diffusivity = sum(vacf)*(dt/velocity.shape[1])
+        return diffusivity
     
     @staticmethod
-    def velocity_description_(velocity):     
+    def velocity_description_(velocity):
         """
             Computes the main features of the velocity distribuition: mean, median, mode, variance,
             standard deviation, range, skewness and kurtosis
-        
-            return velocity_description_: returns a dictionary where the values are bounded 
+
+            :param velocity: velocity array
+            return velocity_description: returns a dictionary where the values are bounded 
             to a key of the same name
         """
         mean = np.mean(velocity,axis=0)  
@@ -471,15 +483,26 @@ class Trajectory(object):
         standard_deviation = np.std(velocity,axis=0) 
         variance = np.var(velocity,axis=0)
         ran = np.abs(np.max(velocity,axis=0) - np.min(velocity,axis=0))
-        skewness = (sum((velocity[:,:]-mean)**3)/len(velocity))/((sum((velocity[:,:]-mean)**2)/len(velocity))**1.5)
-        kurtosis = (sum((velocity[:,:]-mean)**4)/len(velocity))/(standard_deviation**4) - 3
-        mode = np.empty(velocity.shape[1],dtype=object) 
-        for col in range(velocity.shape[1]):
-            vel_values, vel_freq = np.unique(np.round(velocity[:,col],3), return_counts=True,axis=0)
-        if max(vel_freq)==1:
-            mode[col] = 'no mode'
+        if velocity.shape[1] == 1:
+            skewness = (sum((velocity-mean)**3)/len(velocity))/((sum((velocity[:,:]-mean)**2)/len(velocity))**1.5)
+            kurtosis = (sum((velocity-mean)**4)/len(velocity))/(standard_deviation**4) - 3
+            mode = np.empty(velocity.shape[1],dtype=object) 
+            for col in range(velocity.shape[1]):
+                vel_values, vel_freq = np.unique(np.round(velocity,2), return_counts=True,axis=0)
+            if max(vel_freq)==1:
+                mode[col] = 'no mode'
+            else:
+                mode[col] = vel_values[np.where(vel_freq==max(vel_freq))]
         else:
-            mode[col] = vel_values[np.where(vel_freq==max(vel_freq))]
+            skewness = (sum((velocity[:,:]-mean)**3)/len(velocity))/((sum((velocity[:,:]-mean)**2)/len(velocity))**1.5)
+            kurtosis = (sum((velocity[:,:]-mean)**4)/len(velocity))/(standard_deviation**4) - 3
+            mode = np.empty(velocity.shape[1],dtype=object) 
+            for col in range(velocity.shape[1]):
+                vel_values, vel_freq = np.unique(np.round(velocity[:,col],2), return_counts=True,axis=0)
+            if max(vel_freq)==1:
+                mode[col] = 'no mode'
+            else:
+                mode[col] = vel_values[np.where(vel_freq==max(vel_freq))]
         
         velocity_description = {'mean':mean,
                 'median':median,
@@ -494,13 +517,12 @@ class Trajectory(object):
     @staticmethod
     def frequency_spectrum_(position,t): 
         """
-            Computes the Fourier Transform of the trajectory and calculates the dominant frequency,
-            dominant amplitude, main frequencies (given a threshold of 1 Hz), the corresponing
-            amplitudes and mean frequency
-
-            return frequency_spectrum: returns a dictionary where the values are bounded 
-            to a key of the same name
-        """   
+        Computes the Frequency Spectrum using the Fast Fourier Transform algorithm
+        param position: spatial coordinates
+        param t: time
+        return frequency_spectrum_:returns a dictionary containing the dominant frequency and the amplitude associated with it,
+        the mean and main frequencies, the main amplitude and two arrays - one contains the frequencies and the other the amplitudes.
+        """
         dt = t[1] - t[0]
         n = len(t)
         yvalues = position
@@ -511,19 +533,19 @@ class Trajectory(object):
             p1 = np.poly1d(z1)
             yvalues_detrended[:,col] = yvalues[:,col] - p1(xvalues) 
         fourier = np.fft.fft(yvalues_detrended,axis=0,n=n) 
-        limite = np.arange(1,np.floor(n/2),dtype='int') 
-        poder = 2*np.abs(fourier)/n 
-        poder = poder[1:max(limite),:] 
+        limit = np.arange(1,np.floor(n/2),dtype='int') 
+        power = 2*np.abs(fourier)/n 
+        power = power[1:max(limit),:] 
         f = (1/(dt*n))*np.arange(n) 
-        f = f[1:max(limite)] 
-        dominant_frequency = f[np.argmax(poder[:max(limite)],axis=0)] 
-        dominant_amp = np.max(poder[:max(limite)],axis=0) 
+        f = f[1:max(limit)] 
+        dominant_frequency = f[np.argmax(power[:max(limit)],axis=0)] 
+        dominant_amp = np.max(power[:max(limit)],axis=0) 
         main_frequencies = np.empty(shape=yvalues_detrended.shape[1],dtype=object) 
         main_amplitudes = np.empty(shape=yvalues_detrended.shape[1],dtype=object)
         mean_frequency = np.zeros(yvalues_detrended.shape[1])
         for col in range(yvalues_detrended.shape[1]):
-            indice = np.where(poder[:,col]>=1)
-            main_amplitudes[col] = poder[indice,col] 
+            indice = np.where(power[:,col]>=1)
+            main_amplitudes[col] = power[indice,col] 
             main_frequencies[col] = f[indice] 
             mean_frequency[col] = np.mean(indice) 
         frequency_spectrum = {'dominant frequency':dominant_frequency,
@@ -532,5 +554,5 @@ class Trajectory(object):
                             'main frequencies':main_frequencies,
                             'main amplitudes':main_amplitudes,
                             'x':f,
-                            'y':poder}
+                            'y':power}
         return frequency_spectrum
