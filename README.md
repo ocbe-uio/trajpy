@@ -100,8 +100,7 @@ If using the TrajPy package in academic work, please cite Moreira-Soares et al. 
 }
 
 @software{mauricio_moreira_2020_3978699,
-  author       = {Mauricio Moreira and
-                  pyup.io bot},
+  author       = {Mauricio Moreira and Eduardo Mossmann},
   title        = {phydev/trajpy: TrajPy 1.3.1},
   month        = aug,
   year         = 2020,
