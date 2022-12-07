@@ -115,10 +115,12 @@ If using the TrajPy package in academic work, please cite Moreira-Soares et al. 
 ## Contribution
 This is an open source project, and all contributions are welcome. Feel free to open an Issue, a Pull Request, or to e-mail us.
 
+## Publications using trajpy
+ Simões, RF, Pino, R, Moreira-Soares, M, et al. [Quantitative Analysis of Neuronal Mitochondrial Movement Reveals Patterns Resulting from Neurotoxicity of Rotenone and 6-Hydroxydopamine.](https://faseb.onlinelibrary.wiley.com/doi/10.1096/fj.202100899R) FASEB J. 2021; 35:e22024. doi:10.1096/fj.202100899R
+
+Moreira-Soares, M., Pinto-Cunha, S.,  Bordin, J. R., Travasso, R. D. M. *[Adhesion modulates cell morphology and migration within dense fibrous networks](https://www.biorxiv.org/content/10.1101/838995v1)*.  https://doi.org/10.1088/1361-648X/ab7c17
 
 ## References
 Arkin, H. and Janke, W. 2013. Gyration tensor based analysis of the shapes of polymer chains in an attractive spherical cage. J Chem Phys 138, 054904.
-
-Moreira-Soares, M., Pinto-Cunha, S.,  Bordin, J. R., Travasso, R. D. M. *[Adhesion modulates cell morphology and migration within dense fibrous networks](https://www.biorxiv.org/content/10.1101/838995v1)*.  https://doi.org/10.1088/1361-648X/ab7c17
 
 Wagner, T., Kroll, A., Haramagatti, C.R., Lipinski, H.G. and Wiemann, M. 2017. Classification and Segmentation of Nanoparticle Diffusion Trajectories in Cellular Micro Environments. PLoS One 12, e0170165.
