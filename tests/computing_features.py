@@ -11,7 +11,7 @@ class TestFeatures(unittest.TestCase):
 
     def test_efficiency(self):
         """
-            test if the efficiency is being computed correctly for three cases
+            testing if the efficiency is being computed correctly for three cases
             1) linear trajectory 2) random steps and 3) oscillatory.
         """
 
@@ -27,7 +27,7 @@ class TestFeatures(unittest.TestCase):
 
     def test_fractal_dimension(self):
         """
-            test if the fractal dimension is being computed correctly
+            testing if the fractal dimension is being computed correctly
         """
 
         x1 = np.linspace(0, 100, 100)
@@ -88,32 +88,55 @@ class TestFeatures(unittest.TestCase):
         """
             testing the kurtosis function
         """
+        
         r = tj.Trajectory()
-        x1 = np.random.rand(100)
-        x2 = np.random.rand(100)
-        x3 = np.random.rand(100)
+        x1 = np.random.rand(1000)
+        x2 = np.random.rand(1000)
+        x3 = np.random.rand(1000)
         x1x2 = np.array([x1, x2, x3]).transpose()
-        r.gyration_radius = r.gyration_radius_(x1x2)
-        r.eigenvalues, r.eigenvectors = np.linalg.eig(r.gyration_radius)
-        idx = r.eigenvalues.argsort()[::-1]
-        r.kurtosis = r.kurtosis_(x1x2, r.eigenvectors[idx[0]])
-        self.assertAlmostEqual(r.kurtosis, 2.26, places=1)
+        r.gyration_radius = r.gyration_radius_(x1x2)['gyration tensor']
+        r.eigenvalues, r.eigenvectors = r.gyration_radius_(x1x2)['eigenvalues'], r.gyration_radius_(x1x2)['eigenvectors']
+        r.kurtosis = r.kurtosis_(x1x2, r.eigenvectors[:,0])
+        self.assertGreaterEqual(r.kurtosis, 2.0)
+        self.assertLessEqual(r.kurtosis, 3.0)
 
 
     def test_green_kubo(self):
         """
-            test Green-Kubo diffusivity function
+            testing the Green-Kubo diffusivity function
         """
 
         r = tj.Trajectory()
-        x1 = np.linspace(0,100,100)
-        x2 = np.random.rand(100)
-        x3 = np.random.rand(100)
-        r._r = np.array([x1, x2, x3]).transpose()
-        r._t = np.linspace(0,100,100)
-        self.assertAlmostEqual(r.green_kubo_(), 50.53, places=1)
+        velocity = np.ones(shape=(100,1))
+        t = np.arange(0,100)
+        velocity_autocorrelation = np.ones(shape=(100,1))
+        self.assertAlmostEqual(r.green_kubo_(velocity, t, velocity_autocorrelation), 100.0, places=1)
 
+    def test_velocity_description(self):
+        '''
+            testing the velocity description function
+        '''
+        r = tj.Trajectory()
+        velocity = np.random.normal(size = (10000,1))
+        velocity_description = r.velocity_description_(velocity)
+        self.assertAlmostEqual(velocity_description['mean'][0], 0.0, places=1)
+        self.assertAlmostEqual(velocity_description['median'][0], 0.0, places=1)
+        self.assertAlmostEqual(velocity_description['standard_deviation'][0], 1.0, places=1)
+        self.assertAlmostEqual(velocity_description['variance'][0], 1.0, places=1)
+        self.assertAlmostEqual(velocity_description['range'][0], 7.5, places=1)
+        self.assertAlmostEqual(velocity_description['kurtosis'][0], 0.0, places=1)
+        self.assertAlmostEqual(velocity_description['skewness'][0], 0.0, places=1)
 
+    def test_frequency_spectrum(self):
+        '''
+            testing the frequency spectrum function
+        '''
+        r = tj.Trajectory()
+        t = np.linspace(0,1.0,10000).reshape(-1,1)
+        x = 2*np.sin(2*np.pi*100*t).reshape(-1,1)
+        frequency_spectrum = r.frequency_spectrum_(x,t)
+        self.assertAlmostEqual(frequency_spectrum['dominant amplitude'][0], 2, places=1)
+        self.assertAlmostEqual(frequency_spectrum['dominant frequency'][0], 100, places=1)
 
 if __name__ == '__main__':
     unittest.main()
