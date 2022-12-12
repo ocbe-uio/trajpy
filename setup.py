@@ -5,15 +5,15 @@ from setuptools import setup, find_packages
 
 setup(
     name='trajpy',
-    version='1.3.1',
-    url='https://github.com/phydev/trajpy.git',
-    author='Mauricio Moreira',
-    author_email='mms@uc.pt',
+    version='1.4.0',
+    url='https://github.com/ocbe-uio/trajpy.git',
+    author='Mauricio Moreira and Eduardo Mossmann',
+    author_email='trajpy@protonmail.com',
     description='Trajectory classifier for cells, nanoparticles & whatelse.',
+    keywords=['trajectory quantification', 'feature engineering', 'diffusion classification'],
     license='GNU GPLv3',
     platform='Python 3.7',
     packages=find_packages(),
     install_requires=['numpy >= 1.14.3',
-                      'scipy == 1.7.1', #1.5.4
-                      'opencv-contrib-python == 4.5.5.62'],
+                      'scipy == 1.7.1'],
 )
