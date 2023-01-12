@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='trajpy',
-    version='1.4.0',
+    version='1.4.1',
     url='https://github.com/ocbe-uio/trajpy.git',
     author='Mauricio Moreira and Eduardo Mossmann',
     author_email='trajpy@protonmail.com',
@@ -15,5 +15,5 @@ setup(
     platform='Python 3.7',
     packages=find_packages(),
     install_requires=['numpy >= 1.14.3',
-                      'scipy == 1.7.1'],
+                      'scipy >= 1.7.1'],
 )
