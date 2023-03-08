@@ -49,7 +49,7 @@ python setup.py --install
 
 Open a terminal and execute the line bellow
 ```bash
-python3 trajpy.gui
+python3 -m trajpy.gui
 ```
 
 1 - You can open one file at time clicking on `Open file...` or process several files in the same director with `Open directory...`
