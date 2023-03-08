@@ -44,6 +44,25 @@ python setup.py --install
 ```
 
 ## Basic Usage Example
+
+### Using the Graphic User Interface (GUI)
+
+Open a terminal and execute the line bellow
+```bash
+python3 trajpy.gui
+```
+
+1 - You can open one file at time clicking on `Open file...` or process several files in the same director with `Open directory...`.
+2 - Select the features to be computed by ticking the boxes
+3 - Click on `Compute`
+4 - Select the directory and file name where the results will be stored
+
+The processing is ready when the following message appears in the text box located at the bottom of the GUI.
+`Results saved to /path/to/results/output.csv`
+
+
+### Scripting
+
 First we import the package 
 ```python
 import trajpy.trajpy as tj
