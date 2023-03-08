@@ -10,19 +10,21 @@
 
 # TrajPy
 
-Trajectory classification is a challenging task and fundamental for
-analysing the movement of nanoparticles, bacteria, cells and active
-matter in general.
+Trajectory analysis is a challenging task and fundamental for
+understanding the movement of living organisms in various scales.
 
 We propose TrajPy as an easy pythonic solution to be applied in studies that
-demand trajectory classification. It requires little knowledge of programming
+demand trajectory analysis. With a friendly graphic user interface (GUI) it requires little knowledge of computing
 and physics to be used by nonspecialists.
 
 TrajPy is composed of three main units of code:
 
-- The training data set is built using a **trajectory generator**
-- **Features** are computed for characterizing the trajectories
-- The **classifier** built on Scikit-Learn.
+- Basic usage:
+  - The GUI: it is where you interact with trajpy and the only thing you need to know to start using it
+- Advanced  
+  - trajpy.py: it's the heart of trajpy, it computes the **Features** for characterizing the trajectories 
+  - traj_generator.py: a **trajectory generator** that can be used to build a dataset for trajectory classification
+
 
 Our dataset and Machine Learning (ML) model are available for use, as well
 the generator for building your own database.
