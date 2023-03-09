@@ -36,9 +36,11 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with unittest
       run: |
+        coverage run -a unittest tests/general.py
+        coverage -m report
+        # python -m unittest tests/general.py
         # python -m unittest discover -s ./tests  -p '*.py'
-        #python -m unittest tests/computing_features.py
-        python -m unittest tests/general.py
-        #pytest tests/computing_features.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+        # python -m unittest tests/computing_features.py
+        # pytest tests/computing_features.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
         # pytest tests/computing_trajectories.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
         # pytest tests/general.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
