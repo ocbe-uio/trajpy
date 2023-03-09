@@ -34,10 +34,11 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
+    - name: Test with unittest
       run: |
-        # having problem important trajpy package
-        python -m unittest tests/computing_features.py
+        # python -m unittest discover -s ./tests  -p '*.py'
+        #python -m unittest tests/computing_features.py
+        python -m unittest tests/general.py
         #pytest tests/computing_features.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
         # pytest tests/computing_trajectories.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
         # pytest tests/general.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
