@@ -1,6 +1,7 @@
 import numpy as np
 import unittest
 
+import sys
 import os
 src_path = (os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) + '/trajpy/')
 sys.path.append(src_path)
