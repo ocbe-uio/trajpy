@@ -1,5 +1,5 @@
 import numpy as np
-import trajpy as tj
+from trajpy import trajpy as tj
 import unittest
 
 
