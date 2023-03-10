@@ -37,6 +37,9 @@ jobs:
     - name: Test with unittest
       run: |
         python -m unittest tests/general.py
+        python -m unittest tests/computing_features.py
+        python -m unittest tests/computing_trajectories.py
+        
         # coverage run tests/general.py
         # coverage -m report
         # python -m unittest tests/general.py
