@@ -38,7 +38,7 @@ pip3 install trajpy
 ```
 If you want to test the development version, clone the repository at your local directory from your terminal:
 ```bash
-git clone https://github.com/phydev/trajpy
+git clone https://github.com/ocbe-uio/trajpy
 ```
 Then run the setup.py for installing 
 ```bash
