@@ -24,7 +24,7 @@ class trajpy_gui:
         self.init_window()
         self.app.resizable(False, False)
         self.title = tk.Label(self.app, text="TrajPy", font=("Arial Bold", 28))
-        self._version = tk.Label(self.app, text="alpha", font=("Arial Bold", 12))
+        self._version = tk.Label(self.app, text="{}".format(trajpy.__version__), font=("Arial Bold", 12))
         self.entry = tk.Entry(self.app, width=50, highlightcolor='blue')
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.entry.insert(0, self.path)
@@ -122,7 +122,7 @@ class trajpy_gui:
         elif kind=="dir":
             
             # open all files and save trajectories in a list
-
+            self.trajectory_list = []
             for file in self.files:
                 print(self.path, file)
                 self.trajectory_list.append(tj.Trajectory(self.path + "/"+ file, skip_header=1, delimiter=','))
@@ -132,12 +132,13 @@ class trajpy_gui:
         '''
             compute the selected features
         '''
+        
+        if self.kind=="dir":
+            f = tk.filedialog.asksaveasfile(mode='w', defaultextension=".csv")
 
-        f = tk.filedialog.asksaveasfile(mode='w', defaultextension=".csv")
-
-        if f is None:
-            print("No file selected!")
-            return
+            if f is None:
+                print("No file selected!")
+                return
 
         self.data = {}
 
@@ -148,12 +149,12 @@ class trajpy_gui:
             self.data[n] = {}
             
             if any('Anomalous' in feature for feature in self.selected_features):
-                self.r.msd_ea = self.r.msd_ensemble_averaged(self.r._r)
+                self.r.msd_ea = self.r.msd_ensemble_averaged_(self.r._r)
                 self.r.anomalous_exponent = self.r.anomalous_exponent_(self.r.msd_ea, self.r._t)
                 self.data[n]['alpha'] = self.r.anomalous_exponent
 
             if any('MSD' in feature for feature in self.selected_features):
-                self.r.msd_ta = self.r.msd_time_averaged(self.r._r, np.arange(len(self.r._r)))
+                self.r.msd_ta = self.r.msd_time_averaged_(self.r._r, np.arange(len(self.r._r)))
                 self.r.msd_ratio = self.r.msd_ratio_(self.r.msd_ta, n1=2, n2=10)
                 self.data[n]['msd_ratio'] = self.r.msd_ratio
 
@@ -162,11 +163,13 @@ class trajpy_gui:
                 self.data[n]['df'] = self.r.fractal_dimension
 
             if any(item in feature for feature in self.selected_features for item in ['Kurtosis', 'Anisotropy']):
-                self.r.gyration_radius = self.r.gyration_radius_(self.r._r)
-                self.r.eigenvalues, self.r.eigenvectors = np.linalg.eig(self.r.gyration_radius)
-                self.r.eigenvalues[::-1].sort()  # the eigenvalues must be in the descending order
-                self.r._idx = self.r.eigenvalues.argsort()[::-1]  # getting the position of the principal eigenvector
-                self.r.kurtosis = self.r.kurtosis_(self.r._r, self.r.eigenvectors[self.r._idx[0]])
+                gyration_radius_dict = self.r.gyration_radius_(self.r._r)
+                self.r.gyration_radius = gyration_radius_dict['gyration tensor']
+                self.r.eigenvalues = gyration_radius_dict['eigenvalues'] 
+                self.r.eigenvectors = gyration_radius_dict['eigenvectors']
+                #self.r.eigenvalues[::-1].sort()  # the eigenvalues must be in the descending order
+                #self.r._idx = self.r.eigenvalues.argsort()[::-1]  # getting the position of the principal eigenvector
+                self.r.kurtosis = self.r.kurtosis_(self.r._r, self.r.eigenvectors[:,0])
                 self.r.anisotropy = self.r.anisotropy_(self.r.eigenvalues)
                 self.data[n]['anisotropy'] = self.r.anisotropy
                 self.data[n]['kurtosis'] = self.r.kurtosis
@@ -184,24 +187,29 @@ class trajpy_gui:
                 self.data[n]['efficiency'] = self.r.efficiency
 
             if any('Diffusivity' in feature for feature in self.selected_features):
-                self.r.diffusivity = self.r.green_kubo_()
+                self.r.velocity = self.r.velocity_(self.r._r, self.r._t)
+                self.r.vacf = self.r.stationary_velocity_correlation_(self.r.velocity, self.r._t,np.arange(int(len(self.r.velocity))))
+                self.r.diffusivity = self.r.green_kubo_(self.r.velocity, self.r._t,self.r.vacf)
                 self.data[n]['diffusivity'] = self.r.diffusivity
 
             if any('Confinement' in feature for feature in self.selected_features):
                 self.r.confinement_probability = self.r.confinement_probability_(self.r._r0, self.r.diffusivity, self.r._t[-1])
                 self.data[n]['confinement'] = self.r.confinement_probability
             
-        
-        # write the results to a file
-        f.write(','.join(self.data[0].keys())+'\n')
+        if self.kind=="dir":
+            # write the results to a file
+            f.write(','.join(self.data[0].keys())+'\n')
 
-        for n in range(0, len(self.data)):
-            f.write(','.join(map(str, [*self.data[n].values()]))+'\n')
+            for n in range(0, len(self.data)):
+                f.write(','.join(map(str, [*self.data[n].values()]))+'\n')
             
-        f.close()
+            f.close()
 
-        self.results.delete(0, 'end')
-        self.results.insert(0, 'Results saved to {}'.format(f.name))
+            self.results.delete(0, 'end')
+            self.results.insert(0, 'Results saved to {}'.format(f.name))
+        else:
+            self.results.delete(0, 'end')
+            self.results.insert(0, ','.join(map(str, [*self.data[0].values()]))+'\n')
 
     def compute(self):
         f = tk.filedialog.asksaveasfile(mode='w', defaultextension=".csv")
@@ -220,6 +228,8 @@ class trajpy_gui:
         '''
 
         files_list = []
+
+        self.kind = kind
 
         if 'file' in kind:
             path_name = tk.filedialog.askopenfilename(parent=self.app,
