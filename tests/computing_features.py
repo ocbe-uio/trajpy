@@ -63,7 +63,7 @@ class TestFeatures(unittest.TestCase):
         gyration_radius_circle = r.gyration_radius_(circle)
         gyration_radius_osci = r.gyration_radius_(x1x2)
         asymmetry_oscillatory = r.asymmetry_(gyration_radius_osci["eigenvalues"] )
-        asymmetry_circle = r.asymmetry_(gyration_radius_circle["eigenvalues])
+        asymmetry_circle = r.asymmetry_(gyration_radius_circle["eigenvalues"])
 
         self.assertAlmostEqual(asymmetry_oscillatory, asymmetry_oscillatory, places=1)
         self.assertAlmostEqual(asymmetry_circle, asymmetry_circle, places=1)
