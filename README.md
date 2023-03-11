@@ -1,7 +1,5 @@
 [![PyPI version](https://badge.fury.io/py/trajpy.svg)](https://badge.fury.io/py/trajpy)
-[![Maintainability](https://api.codeclimate.com/v1/badges/650cde37de8ccb468b8c/maintainability)](https://codeclimate.com/github/phydev/trajpy/maintainability)
-[![codecov](https://codecov.io/gh/ocbe-uio/trajpy/branch/master/graph/badge.svg?token=lhYwQjiAlU)](https://codecov.io/gh/ocbe-uio/trajpy)
-[![Build Status](https://travis-ci.com/ocbe-uio/trajpy.svg?branch=master)](https://travis-ci.com/ocbe-uio/trajpy)
+![Build Status](https://github.com/ocbe-uio/trajpy/actions/workflows/python-app.yml/badge.svg)
 [![Documentation Status](https://readthedocs.org/projects/trajpy/badge/?version=latest)](https://trajpy.readthedocs.io/en/latest/?badge=latest)
 [![Python3](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/) 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
