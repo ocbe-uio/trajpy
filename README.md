@@ -120,7 +120,6 @@ For more examples please consult the extended documentation: https://trajpy.read
 - numpy >= 1.14.3
 - scipy >= 1.5.4
 
-[ ~ Dependencies scanned by PyUp.io ~ ]
 
 ## Citation
 If using the TrajPy package in academic work, please cite Moreira-Soares et al. (2020), in addition to the relevant methodological papers.
