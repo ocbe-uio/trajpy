@@ -66,6 +66,20 @@ The processing is ready when the following message appears in the text box locat
 
 `Results saved to /path/to/results/output.csv`
 
+### File format
+
+Currently trajpy supportes CSV files organized in 4 columns: time `t` and 3 spatial coordinates `x`, `y`, `z`:
+
+|t|x|y|z|
+|---|---|---|---|
+| 1.00 | 10.00 | 50.00 | 50.00
+| 2.00 | 11.00 | 50.00 | 50.00
+| 3.00 | 11.00 | 50.00 | 50.00
+| 4.00 | 12.00 | 50.00 | 50.00
+| 5.00 | 12.00 | 50.00 | 50.00
+| 6.00 | 13.00 | 50.00 | 50.00
+
+See the [sample file](https://github.com/ocbe-uio/trajpy/blob/a370e49444ea845becb573fd5cc835b5c899c7dc/data/samples/sample.csv) provided in this repository as example.
 
 ### Scripting
 
