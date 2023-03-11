@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='trajpy',
-    version='1.4.1',
+    version='1.4.2',
     url='https://github.com/ocbe-uio/trajpy.git',
     author='Mauricio Moreira and Eduardo Mossmann',
     author_email='trajpy@protonmail.com',
