@@ -150,6 +150,9 @@ If using the TrajPy package in academic work, please cite Moreira-Soares et al. 
 This is an open source project, and all contributions are welcome. Feel free to open an Issue, a Pull Request, or to e-mail us.
 
 ## Publications using trajpy
+
+Eduardo Henrique Mossmann. [A physics based feature engineering framework for trajectory analysis](#). MSc dissertation. Federal University of Pelotas 2022,  Brazil.
+
  Simões, RF, Pino, R, Moreira-Soares, M, et al. [Quantitative Analysis of Neuronal Mitochondrial Movement Reveals Patterns Resulting from Neurotoxicity of Rotenone and 6-Hydroxydopamine.](https://faseb.onlinelibrary.wiley.com/doi/10.1096/fj.202100899R) FASEB J. 2021; 35:e22024. doi:10.1096/fj.202100899R
 
 Moreira-Soares, M., Pinto-Cunha, S.,  Bordin, J. R., Travasso, R. D. M. *[Adhesion modulates cell morphology and migration within dense fibrous networks](https://www.biorxiv.org/content/10.1101/838995v1)*.  https://doi.org/10.1088/1361-648X/ab7c17
