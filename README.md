@@ -66,7 +66,7 @@ The processing is ready when the following message appears in the text box locat
 
 ### File format
 
-Currently trajpy supportes CSV files organized in 4 columns: time `t` and 3 spatial coordinates `x`, `y`, `z`:
+Currently trajpy support CSV files organized in 4 columns: time `t` and 3 spatial coordinates `x`, `y`, `z`:
 
 |t|x|y|z|
 |---|---|---|---|
