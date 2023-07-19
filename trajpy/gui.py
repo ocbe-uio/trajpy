@@ -12,6 +12,7 @@ import numpy as np
 import trajpy.trajpy as tj
 import webbrowser
 import trajpy
+from typing import List, Union, Dict, Optional
 
 print("Tcl Version: {}".format(tk.Tcl().eval('info patchlevel')))
 print("TrajPy Version: {}".format(trajpy.__version__))
@@ -19,7 +20,7 @@ print("Loading TrajPy GUI...")
 
 class trajpy_gui:
 
-    def __init__(self, master):
+    def __init__(self, master: ThemedTk) -> None:
         self.app = master
         self.init_window()
         self.app.resizable(False, False)
@@ -51,7 +52,7 @@ class trajpy_gui:
 
         self.placement()
 
-    def init_window(self):
+    def init_window(self) -> None:
         self.app.title('TrajPy GUI')
         self.app.geometry('600x600')
 
@@ -77,7 +78,7 @@ class trajpy_gui:
     def client_exit(self):
         exit()
 
-    def About(self):
+    def About(self) -> None:
         self.newWindow = tk.Toplevel(self.app)
         self.newWindow.resizable(False, False)
         self.img = Image.open(os.path.dirname(os.path.realpath(__file__))+'/logo.png')
@@ -100,7 +101,7 @@ class trajpy_gui:
         self.email.pack()
 
 
-    def placement(self):
+    def placement(self) -> None:
         self.title.place(x=250, y=10)
         self._version.place(x=300,y=50)
         self.entry.place(x=80, y=100)
@@ -114,7 +115,7 @@ class trajpy_gui:
             self.feats_[button].configure(command=partial(self.select_feat, self.feats_[button]))
             self.feats_[button].place(x=20, y=220 + n * 20)
 
-    def open(self, kind):
+    def open(self, kind: str) -> None:
 
         if kind=="file":
             self.trajectory_list.append(tj.Trajectory(self.path, skip_header=1, delimiter=','))
@@ -128,7 +129,7 @@ class trajpy_gui:
                 self.trajectory_list.append(tj.Trajectory(self.path + "/"+ file, skip_header=1, delimiter=','))
                 
 
-    def compute_selected(self):
+    def compute_selected(self) -> None:
         '''
             compute the selected features
         '''
@@ -211,7 +212,7 @@ class trajpy_gui:
             self.results.delete(0, 'end')
             self.results.insert(0, ','.join(map(str, [*self.data[0].values()]))+'\n')
 
-    def compute(self):
+    def compute(self) -> None:
         f = tk.filedialog.asksaveasfile(mode='w', defaultextension=".csv")
         for n, trajectory in enumerate(self.trajectory_list):
             self.r = trajectory
@@ -222,7 +223,7 @@ class trajpy_gui:
        
         self.results.insert(0, 'Results saved to {}'.format(f.name))
 
-    def get_file(self, kind):
+    def get_file(self, kind: str) -> None:
         '''
             get a file if `kind`=="file" or file list from a given directory if `kind`=="dir"
         '''
@@ -253,7 +254,7 @@ class trajpy_gui:
 
         self.open(kind)
 
-    def save_file(self):
+    def save_file(self) -> None:
         f = tk.filedialog.asksaveasfile(mode='w', defaultextension=".csv")
         if f is None:
             return
@@ -262,14 +263,14 @@ class trajpy_gui:
         f.close()
 
 
-    def show_plot(self):
+    def show_plot(self) -> None:
         self._fig = Figure(figsize=(3, 3), dpi=100)
         self._canvas = FigureCanvasTkAgg(self._fig, master=self.app)
         self._fig.add_subplot(111).plot(self.r._t, self.r._r, ls='-.')
         self._canvas.draw()
         self._canvas.get_tk_widget().place(x=200, y=200)
 
-    def select_feat(self, button):
+    def select_feat(self, button: tk.Widget) -> None:
         if any(button.cget('text') in feature for feature in self.selected_features):
             self.selected_features.remove(button.cget('text'))
             button.deselect()
@@ -285,7 +286,7 @@ class trajpy_gui:
             self.selected_features.append(button.cget('text'))
             button.select()
 
-    def select_all(self):
+    def select_all(self) -> None:
         self.selected_features = []
 
         for n, button in enumerate(self.feats_):
