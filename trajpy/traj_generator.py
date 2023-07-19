@@ -1,7 +1,7 @@
 import numpy as np
+from typing import Union, Tuple
 
-
-def weierstrass_mandelbrot(t, n_displacements, alpha):
+def weierstrass_mandelbrot(t: float, n_displacements: int, alpha: float) -> float:
     """
     Calculates the weierstrass mandelbrot function
     
@@ -25,7 +25,7 @@ def weierstrass_mandelbrot(t, n_displacements, alpha):
     return wsm
 
 
-def anomalous_diffusion(n_steps, n_samples, time_step, alpha):
+def anomalous_diffusion(n_steps: int, n_samples: int, time_step: float, alpha: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generates an ensemble of anomalous trajectories.
 
@@ -51,7 +51,7 @@ def anomalous_diffusion(n_steps, n_samples, time_step, alpha):
     return x, y
 
 
-def normal_distribution(u, D, dt):
+def normal_distribution(u: float, D: float, dt: float) -> float:
     """
     This is the steplength probability density function for normal diffusion.
 
@@ -66,7 +66,7 @@ def normal_distribution(u, D, dt):
     return pdf
 
 
-def normal_diffusion(n_steps, n_samples, dx, y0, D, dt):
+def normal_diffusion(n_steps: int, n_samples: int, dx: float, y0: float, D: float, dt: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generates an ensemble of normal diffusion trajectories.
 
@@ -99,7 +99,7 @@ def normal_diffusion(n_steps, n_samples, dx, y0, D, dt):
     return x, y
 
 
-def confined_diffusion(radius, n_steps, n_samples, dx, y0, D, dt):
+def confined_diffusion(radius: float, n_steps: int, n_samples: int, dx: float, y0: float, D: float, dt: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generates trajectories under confinement.
 
@@ -131,7 +131,7 @@ def confined_diffusion(radius, n_steps, n_samples, dx, y0, D, dt):
     return x, y
 
 
-def superdiffusion(velocity, n_steps, n_samples, y0, dt):
+def superdiffusion(velocity: float, n_steps: int, n_samples: int, y0: float, dt: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generates direct diffusion trajectories. 
     Combine pairwise with normal diffusion components.
@@ -156,7 +156,7 @@ def superdiffusion(velocity, n_steps, n_samples, y0, dt):
     return x, y
 
 
-def save_to_file(y, param, path):
+def save_to_file(y: np.ndarray, param: Union[int, float, str], path: str) -> None:
     """
     Saves the trajectories to a file.
 
