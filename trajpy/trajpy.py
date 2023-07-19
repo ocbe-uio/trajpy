@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.stats import linregress
 import trajpy.auxiliar_functions as aux
+from typing import Union, List, Dict, Tuple
 import warnings
 
 class Trajectory(object):
@@ -9,7 +10,7 @@ class Trajectory(object):
     as a dummy object for calling its functions or you can initialize
     it with a trajectory array or csv file.
     """
-    def __init__(self, trajectory=np.zeros((1, 2)), box_length=None, **params):
+    def __init__(self, trajectory: np.ndarray=np.zeros((1, 2)), box_length: int = None, **params) -> None:
         """
         Initialization function that can be left blank for using staticmethods.
         It can be initialized with an array with shape (N, dim)
@@ -59,7 +60,7 @@ class Trajectory(object):
         self.velocity_description = None
         self.frequency_spectrum = None
 
-    def compute_features(self):
+    def compute_features(self) -> str:
         """
         Compute every feature for the trajectory saved in self._r.
 
@@ -104,7 +105,7 @@ class Trajectory(object):
 
 
     @staticmethod
-    def msd_time_averaged_(spatial_components, tau):
+    def msd_time_averaged_(spatial_components: np.ndarray, tau: Union[np.ndarray, int]) -> np.ndarray:
         """
         calculates the time-averaged mean squared displacement
         
@@ -137,7 +138,7 @@ class Trajectory(object):
         return msd
 
     @staticmethod
-    def msd_ensemble_averaged_(spatial_components):
+    def msd_ensemble_averaged_(spatial_components: np.ndarray) -> np.ndarray:
         """
         calculates the ensemble-averaged mean squared displacement
         
@@ -158,7 +159,7 @@ class Trajectory(object):
         return msd
 
     @staticmethod
-    def msd_ratio_(msd_ta, n1, n2):
+    def msd_ratio_(msd_ta: np.ndarray, n1: int, n2: int) -> float:
         """
         Ratio of the ensemble averaged mean squared displacements.
 
@@ -178,7 +179,7 @@ class Trajectory(object):
         return msd_ratio
 
     @staticmethod
-    def anomalous_exponent_(msd, time_lag):
+    def anomalous_exponent_(msd: np.ndarray, time_lag: np.ndarray) -> float:
         """
         Calculates the diffusion anomalous exponent
 
@@ -202,7 +203,7 @@ class Trajectory(object):
         return anomalous_exponent
 
     @staticmethod
-    def fractal_dimension_(trajectory):
+    def fractal_dimension_(trajectory: np.ndarray) -> Tuple[float, float]:
         """
         Estimates the fractal dimension of the trajectory
 
@@ -236,7 +237,7 @@ class Trajectory(object):
         return fractal_dimension, d_max
     
     @staticmethod
-    def gyration_radius_(trajectory):
+    def gyration_radius_(trajectory: np.ndarray) -> Dict[str, Union[np.ndarray, float]]:
         """
         Calculates the gyration radius tensor of the trajectory
 
@@ -271,7 +272,7 @@ class Trajectory(object):
         return gyration_radius #dictionary 
 
     @staticmethod
-    def asymmetry_(eigenvalues):
+    def asymmetry_(eigenvalues: np.ndarray) -> float:
         """
         Takes the eigenvalues of the gyration radius tensor 
         to estimate the asymmetry between axis.
@@ -294,7 +295,7 @@ class Trajectory(object):
         return asymmetry
 
     @staticmethod
-    def anisotropy_(eigenvalues):
+    def anisotropy_(eigenvalues: np.ndarray) -> float:
         """
         Calculates the trajectory anisotropy using the eigenvalues of the gyration radius tensor.
 
@@ -315,7 +316,7 @@ class Trajectory(object):
         return anisotropy
 
     @staticmethod
-    def straightness_(trajectory):
+    def straightness_(trajectory: np.ndarray) -> float:
         """
         Estimates how much straight is the trajectory
 
@@ -336,7 +337,7 @@ class Trajectory(object):
         return straightness
 
     @staticmethod
-    def kurtosis_(trajectory, eigenvector):
+    def kurtosis_(trajectory: np.ndarray, eigenvector: np.ndarray) -> float:
         """
         We obtain the kurtosis by projecting each position of the trajectory along the main principal eigenvector of the radius of gyration tensor
          :math:`r_i^p = \\mathbf{r} \\cdot \\hat{e}_1` and then calculating the quartic moment
@@ -363,7 +364,7 @@ class Trajectory(object):
         return kurtosis
 
     @staticmethod
-    def gaussianity_(trajectory):
+    def gaussianity_(trajectory: np.ndarray) -> float:
         """
         measure of how close to a gaussian distribution is the trajectory.
 
@@ -380,7 +381,7 @@ class Trajectory(object):
         return gaussianity
 
     @staticmethod
-    def confinement_probability_(r0, D, t, N=100):
+    def confinement_probability_(r0: int, D: float, t: float, N: int = 100) -> float:
         """ new
         Estimate the probability of Brownian particle with
         diffusivity :math:`D` being trapped in the interval :math:`[-r0, +r0]` after a period of time t.
@@ -402,7 +403,7 @@ class Trajectory(object):
         return 1-probability
 
     @staticmethod
-    def efficiency_(trajectory):
+    def efficiency_(trajectory: np.ndarray) -> float:
         """
             Calculates the efficiency of the movement, a measure that is related to
             the straightness.
@@ -424,7 +425,7 @@ class Trajectory(object):
         return efficiency
     
     @staticmethod
-    def velocity_(position,time):
+    def velocity_(position: np.ndarray, time: np.ndarray) -> np.ndarray:
         """
             Computes the velocity associated with the trajectory
         """
@@ -434,7 +435,7 @@ class Trajectory(object):
         return velocity
 
     @staticmethod
-    def stationary_velocity_correlation_(velocity,t,taus):
+    def stationary_velocity_correlation_(velocity: np.ndarray, t: np.ndarray, taus: np.ndarray) -> np.ndarray:
         """
             Computes the stationary velocity autocorrelation function by time average
             .. math:
@@ -455,7 +456,7 @@ class Trajectory(object):
         return time_averaged_corr_velocity
 
     @staticmethod
-    def green_kubo_(velocity,t,vacf):
+    def green_kubo_(velocity: np.ndarray, t:np.ndarray, vacf:np.ndarray) -> float:
         """
             Computes the generalised Green-Kubo's diffusion constant
             :return diffusivity: diffusion constant obtained by the Green-Kubo relation 
@@ -468,7 +469,7 @@ class Trajectory(object):
         return diffusivity
     
     @staticmethod
-    def velocity_description_(velocity):
+    def velocity_description_(velocity: np.ndarray) -> Dict[str, Union[np.ndarray, float, str] ]:
         """
             Computes the main features of the velocity distribuition: mean, median, mode, variance,
             standard deviation, range, skewness and kurtosis
@@ -504,7 +505,7 @@ class Trajectory(object):
         return velocity_description
     
     @staticmethod
-    def frequency_spectrum_(position, time):
+    def frequency_spectrum_(position: np.ndarray, time: np.ndarray) -> Dict[str, Union[np.ndarray, float] ]:
         '''
             Computes the frequency spectrum for each spatial coordinate by using the Fast Fourier Transform algorithm
             param position: spatial coordinates
