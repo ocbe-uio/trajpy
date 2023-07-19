@@ -1,6 +1,7 @@
 import numpy as np
+from typing import Union
 
-def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
+def moment_(trajectory: np.ndarray, order: int = 2, l_size: np.ndarray = np.array([0, 0]), periodic: bool = False) -> float:
     """
     Calculates the n-th statistical moment of the trajectory r.
 
@@ -27,7 +28,7 @@ def moment_(trajectory, order=2, l_size=np.array([0, 0]), periodic=False):
         moment[n] = np.sum(np.power(dr, order))
     return np.sum(moment) / (n_points - 1)
 
-def einstein_diffusion_probability(r, D, t):
+def einstein_diffusion_probability(r: Union[float, np.ndarray], D: float, t: float) -> Union[float, np.ndarray]:
     """
     Calculates the probability of a Brownian particle with
     diffusivity D arriving in the position r after a period of time t.
@@ -46,7 +47,7 @@ def einstein_diffusion_probability(r, D, t):
     return probability
 
 
-def unfold (r_old, r, box):
+def unfold (r_old: np.ndarray, r: np.ndarray, box: Union[float, np.ndarray]) -> np.ndarray:
     """
     Removes effects of periodic boundaries on particle trajectories.
     r_old is the configuration at the previous step 
