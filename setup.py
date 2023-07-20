@@ -22,5 +22,7 @@ setup(
     platform='Python 3.7',
     packages=find_packages(),
     install_requires=['numpy >= 1.14.3',
-                      'scipy >= 1.7.1'],
+                      'scipy >= 1.7.1',
+                     'ttkthemes>=2.4.0',
+                        'Pillow>=8.1.0'],
 )
