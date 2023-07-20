@@ -3,11 +3,6 @@ from ttkthemes import ThemedTk
 from functools import partial
 import os
 from PIL import ImageTk, Image
-from matplotlib.backends.backend_tkagg import (
-    FigureCanvasTkAgg, NavigationToolbar2Tk)
-# Implement the default Matplotlib key bindings.
-from matplotlib.backend_bases import key_press_handler
-from matplotlib.figure import Figure
 import numpy as np
 import trajpy.trajpy as tj
 import webbrowser
@@ -31,7 +26,6 @@ class trajpy_gui:
         self.entry.insert(0, self.path)
         self.find_bt = tk.Button(self.app, text="Open file...", command=partial(self.get_file, 'file'))
         self.find_dir_bt = tk.Button(self.app, text="Open directory...", command=partial(self.get_file, 'dir'))
-        self.plot_bt = tk.Button(self.app, text="Plot", command=self.show_plot)
         self.button_select_all = tk.Checkbutton(self.app, text='Select all')
         self.button_select_all.configure(command=self.select_all)
         self.button_compute = tk.Button(self.app, text="Compute!", command=self.compute_selected)
@@ -107,7 +101,6 @@ class trajpy_gui:
         self.entry.place(x=80, y=100)
         self.find_bt.place(x=250, y=130)
         self.find_dir_bt.place(x=320, y=130)
-        self.plot_bt.place(x=440, y=130)
         self.button_select_all.place(x=20, y=230 + (len(self.feats_) + 1) * 20)
         self.button_compute.place(x=20, y=230 + (len(self.feats_) + 3) * 20)
         self.results.place(x=20, y=230 + (len(self.feats_) + 5) * 20)
@@ -261,14 +254,6 @@ class trajpy_gui:
         f.write(','.join(self.data.keys())+'\n')
         f.write(','.join(self.data.values())+'\n')
         f.close()
-
-
-    def show_plot(self) -> None:
-        self._fig = Figure(figsize=(3, 3), dpi=100)
-        self._canvas = FigureCanvasTkAgg(self._fig, master=self.app)
-        self._fig.add_subplot(111).plot(self.r._t, self.r._r, ls='-.')
-        self._canvas.draw()
-        self._canvas.get_tk_widget().place(x=200, y=200)
 
     def select_feat(self, button: tk.Widget) -> None:
         if any(button.cget('text') in feature for feature in self.selected_features):
