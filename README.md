@@ -116,7 +116,10 @@ For more examples please consult the extended documentation: https://trajpy.read
 ## Requirements
 
 - numpy >= 1.14.3
-- scipy >= 1.5.4
+- scipy >= 1.7.1
+- ttkthemes >= 2.4.0
+- Pillow >= 8.1.0
+- PyYAML >= 5.3.1
 
 
 ## Citation
