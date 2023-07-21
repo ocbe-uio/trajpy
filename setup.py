@@ -25,5 +25,5 @@ setup(
                       'scipy >= 1.7.1',
                      'ttkthemes>=2.4.0',
                         'Pillow>=8.1.0',
-                     'yaml >= 5.3.1'],
+                     'PyYAML >= 5.3.1'],
 )
