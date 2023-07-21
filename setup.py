@@ -24,5 +24,6 @@ setup(
     install_requires=['numpy >= 1.14.3',
                       'scipy >= 1.7.1',
                      'ttkthemes>=2.4.0',
-                        'Pillow>=8.1.0'],
+                        'Pillow>=8.1.0',
+                     'yaml >= 5.3.1'],
 )
