@@ -64,8 +64,9 @@ The processing is ready when the following message appears in the text box locat
 
 `Results saved to /path/to/results/output.csv`
 
-### File format
+### File formats
 
+#### Comma separated values (CSV)
 Currently trajpy support CSV files organized in 4 columns: time `t` and 3 spatial coordinates `x`, `y`, `z`:
 
 |t|x|y|z|
@@ -78,6 +79,23 @@ Currently trajpy support CSV files organized in 4 columns: time `t` and 3 spatia
 | 6.00 | 13.00 | 50.00 | 50.00
 
 See the [sample file](https://github.com/ocbe-uio/trajpy/blob/a370e49444ea845becb573fd5cc835b5c899c7dc/data/samples/sample.csv) provided in this repository as example.
+
+#### LAMMPS YAML dump format
+
+LAMMPS YAML files are defined with the following structure:
+```yaml
+    ---
+    time: 0.0
+    natoms: 100
+    keywords: [id, type, x, y, z, vx, vy, vz, fx, fy, fz]
+    data:
+    - [1, 1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -nan, -nan, -nan]
+    - [2, 1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -nan, -nan, -nan]
+    - [3, 1, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -nan, -nan, -nan]
+    ...
+```
+We provide support for parsing this type of data files with the function [`parse_lammps_dump_yaml()`](https://github.com/ocbe-uio/trajpy/blob/8381bedfc3f0d696072af1d66f08af497eb0cced/trajpy/auxiliar_functions.py#L5).
+
 
 ### Scripting
 
