@@ -4,7 +4,7 @@
 [![Python3](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/) 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![DOI](https://zenodo.org/badge/194252287.svg)](https://zenodo.org/badge/latestdoi/194252287)
-
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ocbe-uio/trajpy/master?labpath=%2Fexamples%2Fclinical_data_analysis_tutorial.ipynb)
 
 # TrajPy
 
