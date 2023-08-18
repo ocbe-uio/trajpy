@@ -1,0 +1,2 @@
+# exclude jupyter notebooks from linguist analysis
+examples/clinical_data_analysis_tutorial.ipynb linguist-generated=true
