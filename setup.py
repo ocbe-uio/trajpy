@@ -10,11 +10,11 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name='trajpy',
-    version='1.4.2',
+    version='1.4.3',
     url='https://github.com/ocbe-uio/trajpy.git',
-    author='Mauricio Moreira and Eduardo Mossmann',
+    author='Mauricio Moreira',
     author_email='trajpy@protonmail.com',
-    description='Feature engineering for time series data made easy.',
+    description='Empowering feature engineering for trajectory analysis across domains.',
     long_description=long_description,
     long_description_content_type='text/markdown',
     keywords=['trajectory quantification', 'feature engineering', 'diffusion classification'],
