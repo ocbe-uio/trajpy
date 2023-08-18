@@ -1,7 +1,8 @@
 import numpy as np
 import trajpy.trajpy as tj
 import unittest
-import os
+import os.path  
+import unittest
 
 
 class TestGeneral(unittest.TestCase):
@@ -18,7 +19,7 @@ class TestGeneral(unittest.TestCase):
             - test if compute_all = True runs without error
         """
         traj = np.zeros((370, 4))
-        path = os.environ['TRAVIS_BUILD_DIR']
+        path = (os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
         init_from_file = tj.Trajectory(path+'/data/samples/sample.csv',
                                        skip_header=1, delimiter=',')
