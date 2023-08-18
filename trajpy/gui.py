@@ -1,3 +1,4 @@
+from tkinter import filedialog
 import tkinter as tk
 from ttkthemes import ThemedTk
 from functools import partial
@@ -128,7 +129,7 @@ class trajpy_gui:
         '''
         
         if self.kind=="dir":
-            f = tk.filedialog.asksaveasfile(mode='w', defaultextension=".csv")
+            f = filedialog.asksaveasfile(mode='w', defaultextension=".csv")
 
             if f is None:
                 print("No file selected!")
@@ -206,7 +207,7 @@ class trajpy_gui:
             self.results.insert(0, ','.join(map(str, [*self.data[0].values()]))+'\n')
 
     def compute(self) -> None:
-        f = tk.filedialog.asksaveasfile(mode='w', defaultextension=".csv")
+        f = filedialog.asksaveasfile(mode='w', defaultextension=".csv")
         for n, trajectory in enumerate(self.trajectory_list):
             self.r = trajectory
             results = self.r.compute_features()
@@ -226,11 +227,11 @@ class trajpy_gui:
         self.kind = kind
 
         if 'file' in kind:
-            path_name = tk.filedialog.askopenfilename(parent=self.app,
+            path_name = filedialog.askopenfilename(parent=self.app,
                                                       initialdir=self.path,
                                                       title='Please select a file')
         elif 'dir' in kind:
-            path_name = tk.filedialog.askdirectory(parent=self.app,
+            path_name = filedialog.askdirectory(parent=self.app,
                                                     initialdir=self.path,
                                                     title='Please select a folder')
             # write a file list
@@ -248,7 +249,7 @@ class trajpy_gui:
         self.open(kind)
 
     def save_file(self) -> None:
-        f = tk.filedialog.asksaveasfile(mode='w', defaultextension=".csv")
+        f = filedialog.asksaveasfile(mode='w', defaultextension=".csv")
         if f is None:
             return
         f.write(','.join(self.data.keys())+'\n')
