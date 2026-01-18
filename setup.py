@@ -1,12 +1,10 @@
 """
 this setup will check for dependencies and install TrajPy on your computer
 """
-"""
-this setup will check for dependencies and install TrajPy on your computer
-"""
 from pathlib import Path
-from setuptools import setup, find_packages
+
 import tomllib
+from setuptools import find_packages, setup
 
 # Read pyproject.toml
 pyproject_path = Path(__file__).parent / "pyproject.toml"

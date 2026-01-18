@@ -1,7 +1,8 @@
-import pytest
+
 import numpy as np
+import pytest
+
 from trajpy.auxiliar_functions import parse_lammps_dump_yaml
-import os
 
 
 class TestParseLammpsDumpYaml:

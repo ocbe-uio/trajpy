@@ -1,14 +1,15 @@
-from tkinter import filedialog
-import tkinter as tk
-from ttkthemes import ThemedTk
-from functools import partial
 import os
-from PIL import ImageTk, Image
-import numpy as np
-import trajpy.trajpy as tj
+import tkinter as tk
 import webbrowser
+from functools import partial
+from tkinter import filedialog
+
+import numpy as np
+from PIL import Image, ImageTk
+from ttkthemes import ThemedTk
+
 import trajpy
-from typing import List, Union, Dict, Optional
+import trajpy.trajpy as tj
 
 print("Tcl Version: {}".format(tk.Tcl().eval('info patchlevel')))
 print("TrajPy Version: {}".format(trajpy.__version__))

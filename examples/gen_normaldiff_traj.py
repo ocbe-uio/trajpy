@@ -1,5 +1,7 @@
-import trajpy.traj_generator as tjg
 import numpy as np
+
+import trajpy.traj_generator as tjg
+
 """
     generates N normal diffusion trajectories for each value of diffusion coefficient
 """

@@ -1,8 +1,10 @@
+from typing import Dict, Tuple, Union
+
 import numpy as np
 from scipy.stats import linregress
+
 import trajpy.auxiliar_functions as aux
-from typing import Union, List, Dict, Tuple
-import warnings
+
 
 class Trajectory(object):
     """
@@ -24,17 +26,17 @@ class Trajectory(object):
         :param trajectory: 2D trajectory as a function of time (t, x, y)
         :param params: use params for passing parameters into np.genfromtxt()
         """
-        if type(trajectory) == str:
+        if type(trajectory) is str:
             trajectory = np.genfromtxt(trajectory, **params)
 
-        if type(trajectory) == np.ndarray:
+        if type(trajectory) is np.ndarray:
             self._t, self._r = trajectory[:, 0], trajectory[:, 1:]
-        elif type(trajectory) == tuple:
+        elif type(trajectory) is tuple:
             self._t, self._r = np.asarray(trajectory[0]), np.asarray(trajectory[1:])
         else:
             raise TypeError('trajectory receives an array or a filename as input.')
 
-        if box_length != None:
+        if box_length is not None:
             self._r = aux.unfold(self._r[0], self._r, box_length)
             
         self.msd_ta = None  # time-averaged mean squared displacement
@@ -118,7 +120,7 @@ class Trajectory(object):
         :param tau: time lag, it can be a single value or an array
         :return msd: time-averaged MSD
         """
-        if type(tau) == int:
+        if type(tau) is int:
             tau = np.asarray([tau])
 
         msd = np.zeros(len(tau))
@@ -461,9 +463,7 @@ class Trajectory(object):
             Computes the generalised Green-Kubo's diffusion constant
             :return diffusivity: diffusion constant obtained by the Green-Kubo relation 
         """
-        
-        diffusivity = 0.
-        N = len(velocity)
+
         dt = t[1] - t[0]
         diffusivity = sum(vacf)*(dt/velocity.shape[1])
         return diffusivity

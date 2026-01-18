@@ -1,7 +1,9 @@
+import unittest
+
 import numpy as np
+
 import trajpy.traj_generator as tjg
 import trajpy.trajpy as tj
-import unittest
 
 
 class TestTrajectoryGenerator(unittest.TestCase):

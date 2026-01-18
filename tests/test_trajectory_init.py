@@ -1,8 +1,9 @@
+import os.path
+import unittest
+
 import numpy as np
+
 import trajpy.trajpy as tj
-import unittest
-import os.path  
-import unittest
 
 
 class TestGeneral(unittest.TestCase):

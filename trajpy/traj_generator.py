@@ -1,5 +1,7 @@
+from typing import Tuple, Union
+
 import numpy as np
-from typing import Union, Tuple
+
 
 def weierstrass_mandelbrot(t: float, n_displacements: int, alpha: float) -> float:
     """
