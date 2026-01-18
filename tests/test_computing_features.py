@@ -1,11 +1,15 @@
-import numpy as np
+import os
+import sys
 import unittest
 
-import sys
-import os
+import numpy as np
+
+import trajpy.trajpy as tj
+
 src_path = (os.path.abspath(os.path.join(os.path.dirname(__file__), '..')) + '/trajpy/')
 sys.path.append(src_path)
-import trajpy.trajpy as tj
+
+
 
 class TestFeatures(unittest.TestCase):
  

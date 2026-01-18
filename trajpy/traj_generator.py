@@ -1,5 +1,7 @@
+from typing import Tuple, Union
+
 import numpy as np
-from typing import Union, Tuple
+
 
 def weierstrass_mandelbrot(t: float, n_displacements: int, alpha: float) -> float:
     """
@@ -121,11 +123,11 @@ def confined_diffusion(radius: float, n_steps: int, n_samples: int, dx: float, y
         for i_step in range(0, n_steps):
             
             sub_x, sub_y = normal_diffusion(n_steps=100, n_samples=1, dx=dx, y0=sub_step, D=D, dt=dt)
-            
-            if sub_y[-1] < radius:
+
+            if sub_y[-1, 0] < radius:
                 t = i_step * dt
-                y[i_step, i_sample] = sub_y[-1]
-                sub_step = sub_y[-1]
+                y[i_step, i_sample] = sub_y[-1, 0]
+                sub_step = sub_y[-1, 0]
                 x[i_step] = t
 
     return x, y

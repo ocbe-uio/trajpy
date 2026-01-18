@@ -1,0 +1,109 @@
+[project]
+name = "trajpy"
+version = "1.4.3"
+description = "Trajpy - empowering feature engineering for trajectory analysis across domains."
+authors = [
+    { name = "Maurício Moreira Soares", email = "trajpy@protonmail.ch"}
+]
+readme = "README.md"
+
+requires-python = ">=3.11,<4.0"
+license = "MIT"
+keywords = [
+  "python",
+  "trajectory",
+  "time-series",
+  "repeated-mesurements"
+]
+dependencies = [
+    "numpy>=1.14.3",
+    "scipy>=1.7.1",
+    "ttkthemes>=2.4.0",
+    "Pillow>=8.1.0",
+    "PyYAML>=5.3.1",
+]
+
+[project.urls]
+homepage = "https://github.com/ocbe-uio/trajpy"
+
+[tool.poetry]
+package-mode = true
+
+[dependency-groups]
+dev= [
+    "black>=25.1.0",
+    "bandit>=1.7.10",
+    "pyright>=1.1.404",
+    "ruff>=0.12.10",
+    "ruff-lsp>=0.0.62",
+    "ipython>=9.4.0",
+    "pytest>=9.0.0",
+    "pytest-cov>=6.0.0",
+    "setuptools>=80.0.0",
+    "pytest-stub>=1.1.0",
+]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=2.0.0",
+    "sphinx-autodoc-typehints>=1.25.0",
+    "nbsphinx>=0.9.0"
+]
+
+[project.optional-dependencies]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=2.0.0",
+    "sphinx-autodoc-typehints>=1.25.0",
+    "nbsphinx>=0.9.0",
+]
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+exclude = []
+
+[tool.ruff.lint]
+select = [
+  "E",   # pycodestyle: style errors (spacing, indentation, blank lines, etc.)
+  "F",   # Pyflakes: real errors like undefined/unused names and imports
+  "I",   # isort: import sorting and grouping
+]
+ignore = ["ARG002", "E501"] # Allow unused parameters in handlers (e.g. `request` in views)
+
+[tool.black]
+line-length = 120
+
+[tool.pyright]
+typeCheckingMode = "off"
+reportMissingImports = false
+reportMissingTypeStubs = false
+useLibraryCodeForTypes = true
+include = ["trajpy"]
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+
+[tool.pytest.ini_options]
+addopts = "--ignore=tests/test_local_date_utils --cov --cov-report term-missing"
+
+[tool.coverage.run]
+source = ["trajpy"]
+omit = ["tests/*"]
+
+[tool.setuptools.package-data]
+"trajpy" = []
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["trajpy*"]
+exclude = ["tests"]

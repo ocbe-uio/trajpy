@@ -1,0 +1,15 @@
+.venv
+dist
+build
+*.egg-info
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.idea/
+.vscode/
+.DS_Store
+*.xlsx
+.coverage
+_build/

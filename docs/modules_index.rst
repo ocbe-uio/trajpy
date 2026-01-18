@@ -6,7 +6,7 @@ Module Documentation
 Documentation for every module and function found in TrajPy.
 
 TrajPy
------
+------
 
 .. automodule:: trajpy.trajpy
   :members:
@@ -15,7 +15,7 @@ TrajPy
   :show-inheritance:
 
 Trajectory Generator
-------
+--------------------
 
 .. automodule:: trajpy.traj_generator
   :members:

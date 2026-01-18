@@ -1,6 +1,8 @@
-import numpy as np
 from typing import Union
+
+import numpy as np
 import yaml
+
 
 def parse_lammps_dump_yaml(filename):
     """
