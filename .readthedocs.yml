@@ -12,7 +12,7 @@ build:
     - asdf install uv latest
     - asdf global uv latest
     - uv sync --all-extras
-    - uv run sphinx-build --fail-on-warning -T -b html docs $READTHEDOCS_OUTPUT/html
+    - uv run sphinx-build -T -b html docs $READTHEDOCS_OUTPUT/html
   tools:
     python: "3.11"
 

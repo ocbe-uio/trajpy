@@ -3,7 +3,7 @@ Tutorial
 
 
 Simple Example
---------
+--------------
 
 In this example the trajectory stored in a csv file will be loaded and the features computed.
 ::
@@ -18,7 +18,7 @@ In this example the trajectory stored in a csv file will be loaded and the featu
 
 
 Accessing Features
---------
+------------------
 
   >>> r.asymmetry
   >>> 0.5782095322093505
