@@ -1,0 +1,69 @@
+---
+creator: LAMMPS
+timestep: 0
+units: lj
+time: 0
+natoms: 1
+boundary: [ p, p, p, p, p, p, ]
+thermo:
+  - keywords: [ Step, Temp, E_pair, E_mol, TotEng, Press, ]
+  - data: [ 0, 0, -27093.472213010766, 0, 0, 0, ]
+box:
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 0, 0 ]
+keywords: [ id, type, x, y, z, vx, vy, vz, ix, iy, iz,  ]
+data:
+  - [     1 , 1 ,  0.000000e+00 ,  0.000000e+00 ,  0.000000e+00 ,  -1.841579e-01 , -9.710036e-01 , -2.934617e+00 , 0 , 0 , 0, ]
+---
+timestep: 100
+units: lj
+time: 0.5
+natoms: 1
+boundary: [ p, p, p, p, p, p, ]
+thermo:
+  - keywords: [ Step, Temp, E_pair, E_mol, TotEng, Press, ]
+  - data: [ 0, 0, -27093.472213010766, 0, 0, 0, ]
+box:
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 0, 0 ]
+keywords: [ id, type, x, y, z, vx, vy, vz, ix, iy, iz,  ]
+data:
+  - [     1 , 1 ,  0.000000e+00 ,  0.000000e+00 ,  0.000000e+00 ,  -1.841579e-01 , -9.710036e-01 , -2.934617e+00 , 0 , 0 , 0, ]
+---
+timestep: 200
+units: lj
+time: 1.0
+natoms: 1
+boundary: [ p, p, p, p, p, p, ]
+thermo:
+  - keywords: [ Step, Temp, E_pair, E_mol, TotEng, Press, ]
+  - data: [ 0, 0, -27093.472213010766, 0, 0, 0, ]
+box:
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 0, 0 ]
+keywords: [ id, type, x, y, z, vx, vy, vz, ix, iy, iz,  ]
+data:
+  - [     1 , 1 ,  0.000000e+00 ,  0.000000e+00 ,  0.000000e+00 ,  -1.841579e-01 , -9.710036e-01 , -2.934617e+00 , 0 , 0 , 0, ]
+---
+timestep: 300
+units: lj
+time: 1.5
+natoms: 1
+boundary: [ p, p, p, p, p, p, ]
+thermo:
+  - keywords: [ Step, Temp, E_pair, E_mol, TotEng, Press, ]
+  - data: [ 0, 0, -27093.472213010766, 0, 0, 0, ]
+box:
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 16.795961913825074 ]
+  - [ 0, 0, 0 ]
+keywords: [ id, type, x, y, z, vx, vy, vz, ix, iy, iz,  ]
+data:
+  - [     1 , 1 ,  0.000000e+00 ,  0.000000e+00 ,  0.000000e+00 ,  -1.841579e-01 , -9.710036e-01 , -2.934617e+00 , 0 , 0 , 0, ]

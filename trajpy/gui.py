@@ -112,7 +112,22 @@ class trajpy_gui:
     def open(self, kind: str) -> None:
 
         if kind=="file":
-            self.trajectory_list.append(tj.Trajectory(self.path, skip_header=1, delimiter=','))
+
+            self.trajectory_list = []
+
+            if self.path.endswith('.yaml') or self.path.endswith('.yml'):
+                from trajpy.auxiliar_functions import parse_lammps_dump_yaml
+                positions = parse_lammps_dump_yaml(self.path)
+                # positions has shape (num_time_steps, num_atoms, 4)
+                # We need to process each atom's trajectory separately
+                num_atoms = positions.shape[1]
+                for atom_idx in range(num_atoms):
+                    # Extract trajectory for this atom: (time_steps, 4) -> (time, x, y, z)
+                    atom_trajectory = positions[:, atom_idx, :]
+                    self.trajectory_list.append(tj.Trajectory(atom_trajectory))
+            else:
+                self.trajectory_list.append(tj.Trajectory(self.path, skip_header=1, delimiter=','))
+
 
         elif kind=="dir":
             

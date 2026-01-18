@@ -1,29 +1,46 @@
 """
 this setup will check for dependencies and install TrajPy on your computer
 """
-from setuptools import setup, find_packages
-
-# read the contents of your README file
+"""
+this setup will check for dependencies and install TrajPy on your computer
+"""
 from pathlib import Path
+from setuptools import setup, find_packages
+import tomllib
+
+# Read pyproject.toml
+pyproject_path = Path(__file__).parent / "pyproject.toml"
+with open(pyproject_path, "rb") as f:
+    pyproject_data = tomllib.load(f)
+
+# Extract project metadata
+project = pyproject_data["project"]
+poetry_deps = pyproject_data["tool"]["poetry"]["dependencies"]
+
+# Read README
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
+# Convert poetry dependencies to setuptools format
+install_requires = [
+    f"{name} {version}" if not isinstance(version, dict) else name
+    for name, version in poetry_deps.items()
+    if name != "python"
+]
+
 setup(
-    name='trajpy',
-    version='1.4.3',
-    url='https://github.com/ocbe-uio/trajpy.git',
-    author='Mauricio Moreira',
-    author_email='trajpy@protonmail.com',
-    description='Empowering feature engineering for trajectory analysis across domains.',
+    name=project["name"],
+    version=project["version"],
+    url=project["urls"]["homepage"],
+    author=project["authors"][0]["name"],
+    author_email=project["authors"][0]["email"],
+    description=project["description"],
     long_description=long_description,
     long_description_content_type='text/markdown',
-    keywords=['trajectory quantification', 'feature engineering', 'diffusion classification'],
-    license='GNU GPLv3',
-    platform='Python 3.7',
+    keywords=project.get("keywords", []),
+    license=project["license"],
+    python_requires=project["requires-python"],
     packages=find_packages(),
-    install_requires=['numpy >= 1.14.3',
-                      'scipy >= 1.7.1',
-                     'ttkthemes>=2.4.0',
-                        'Pillow>=8.1.0',
-                     'PyYAML >= 5.3.1'],
+    install_requires=install_requires,
 )
+
