@@ -134,18 +134,17 @@ def normalize_upload_event(event):
 
     return normalized
 
-# Example handler using the normalizer
 def handle_upload(event):
     try:
         uploaded = normalize_upload_event(event)   # -> list of (name, bytes)
-        state['uploaded_files'] = uploaded
-        result_box.set_text(f"{len(uploaded)} file(s) uploaded")
+        # Append to existing files instead of replacing
+        state['uploaded_files'].extend(uploaded)
+        result_box.set_text(f"{len(state['uploaded_files'])} file(s) uploaded total")
+        # Reload all trajectories from all uploaded files
         state['trajectories'] = load_trajectories_from_uploads(state['uploaded_files'])
-        result_box.set_text(f"{len(state['trajectories'])} trajectory(ies) loaded")
+        result_box.set_text(f"{len(state['trajectories'])} trajectory(ies) loaded from {len(state['uploaded_files'])} file(s)")
     except Exception as e:
         result_box.set_text(f"Error loading files: {e}")
-
-
 
 
 def compute_selected():
@@ -155,69 +154,148 @@ def compute_selected():
 
     selected = [feat for feat, cb in checkboxes.items() if cb.value]
     state['results'] = {}
+    errors = []
+
     for n, trajectory in enumerate(state['trajectories']):
         r = trajectory
         state['results'][n] = {}
 
         if any('Anomalous' in feature for feature in selected):
-            r.msd_ea = r.msd_ensemble_averaged_(r._r)
-            r.anomalous_exponent = r.anomalous_exponent_(r.msd_ea, r._t)
-            state['results'][n]['alpha'] = r.anomalous_exponent
+            try:
+                r.msd_ea = r.msd_ensemble_averaged_(r._r)
+                r.anomalous_exponent = r.anomalous_exponent_(r.msd_ea, r._t)
+                if np.isnan(r.anomalous_exponent) or np.isinf(r.anomalous_exponent):
+                    state['results'][n]['alpha'] = 'N/A'
+                else:
+                    state['results'][n]['alpha'] = r.anomalous_exponent
+            except Exception as e:
+                errors.append(f"Trajectory {n + 1}: Anomalous Exponent - {str(e)}")
+                state['results'][n]['alpha'] = 'Error'
 
         if any('MSD' in feature for feature in selected):
-            r.msd_ta = r.msd_time_averaged_(r._r, np.arange(len(r._r)))
-            r.msd_ratio = r.msd_ratio_(r.msd_ta, n1=2, n2=10)
-            state['results'][n]['msd_ratio'] = r.msd_ratio
+            try:
+                r.msd_ta = r.msd_time_averaged_(r._r, np.arange(len(r._r)))
+                r.msd_ratio = r.msd_ratio_(r.msd_ta, n1=2, n2=10)
+                if np.isnan(r.msd_ratio) or np.isinf(r.msd_ratio):
+                    state['results'][n]['msd_ratio'] = 'N/A'
+                else:
+                    state['results'][n]['msd_ratio'] = r.msd_ratio
+            except Exception as e:
+                errors.append(f"Trajectory {n + 1}: MSD Ratio - {str(e)}")
+                state['results'][n]['msd_ratio'] = 'Error'
 
         if any('Fractal' in feature for feature in selected):
-            r.fractal_dimension, r._r0 = r.fractal_dimension_(r._r)
-            state['results'][n]['df'] = r.fractal_dimension
+            try:
+                r.fractal_dimension, r._r0 = r.fractal_dimension_(r._r)
+                if np.isnan(r.fractal_dimension) or np.isinf(r.fractal_dimension):
+                    state['results'][n]['df'] = 'N/A'
+                else:
+                    state['results'][n]['df'] = r.fractal_dimension
+            except Exception as e:
+                errors.append(f"Trajectory {n + 1}: Fractal Dimension - {str(e)}")
+                state['results'][n]['df'] = 'Error'
 
         if any(item in feature for feature in selected for item in ['Kurtosis', 'Anisotropy']):
-            gyration_radius_dict = r.gyration_radius_(r._r)
-            r.gyration_radius = gyration_radius_dict['gyration tensor']
-            r.eigenvalues = gyration_radius_dict['eigenvalues']
-            r.eigenvectors = gyration_radius_dict['eigenvectors']
-            r.kurtosis = r.kurtosis_(r._r, r.eigenvectors[:,0])
-            r.anisotropy = r.anisotropy_(r.eigenvalues)
-            state['results'][n]['anisotropy'] = r.anisotropy
-            state['results'][n]['kurtosis'] = r.kurtosis
+            try:
+                gyration_radius_dict = r.gyration_radius_(r._r)
+                r.gyration_radius = gyration_radius_dict['gyration tensor']
+                r.eigenvalues = gyration_radius_dict['eigenvalues']
+                r.eigenvectors = gyration_radius_dict['eigenvectors']
+                r.kurtosis = r.kurtosis_(r._r, r.eigenvectors[:, 0])
+                r.anisotropy = r.anisotropy_(r.eigenvalues)
+
+                if np.isnan(r.anisotropy) or np.isinf(r.anisotropy):
+                    state['results'][n]['anisotropy'] = 'N/A'
+                else:
+                    state['results'][n]['anisotropy'] = r.anisotropy
+
+                if np.isnan(r.kurtosis) or np.isinf(r.kurtosis):
+                    state['results'][n]['kurtosis'] = 'N/A'
+                else:
+                    state['results'][n]['kurtosis'] = r.kurtosis
+            except Exception as e:
+                errors.append(f"Trajectory {n + 1}: Anisotropy/Kurtosis - {str(e)}")
+                state['results'][n]['anisotropy'] = 'Error'
+                state['results'][n]['kurtosis'] = 'Error'
 
         if any('Gaussianity' in feature for feature in selected):
-            r.gaussianity = r.gaussianity_(r._r)
-            state['results'][n]['gaussianity'] = r.gaussianity
+            try:
+                r.gaussianity = r.gaussianity_(r._r)
+                if np.isnan(r.gaussianity) or np.isinf(r.gaussianity):
+                    state['results'][n]['gaussianity'] = 'N/A'
+                else:
+                    state['results'][n]['gaussianity'] = r.gaussianity
+            except Exception as e:
+                errors.append(f"Trajectory {n + 1}: Gaussianity - {str(e)}")
+                state['results'][n]['gaussianity'] = 'Error'
 
         if any('Straightness' in feature for feature in selected):
-            r.straightness = r.straightness_(r._r)
-            state['results'][n]['straightness'] = r.straightness
+            try:
+                r.straightness = r.straightness_(r._r)
+                if np.isnan(r.straightness) or np.isinf(r.straightness):
+                    state['results'][n]['straightness'] = 'N/A'
+                else:
+                    state['results'][n]['straightness'] = r.straightness
+            except Exception as e:
+                errors.append(f"Trajectory {n + 1}: Straightness - {str(e)}")
+                state['results'][n]['straightness'] = 'Error'
 
         if any('Efficiency' in feature for feature in selected):
-            r.efficiency = r.efficiency_(r._r)
-            state['results'][n]['efficiency'] = r.efficiency
+            try:
+                r.efficiency = r.efficiency_(r._r)
+                if np.isnan(r.efficiency) or np.isinf(r.efficiency):
+                    state['results'][n]['efficiency'] = 'N/A'
+                else:
+                    state['results'][n]['efficiency'] = r.efficiency
+            except Exception as e:
+                errors.append(f"Trajectory {n + 1}: Efficiency - {str(e)}")
+                state['results'][n]['efficiency'] = 'Error'
 
         if any('Diffusivity' in feature for feature in selected):
-            r.velocity = r.velocity_(r._r, r._t)
-            r.vacf = r.stationary_velocity_correlation_(r.velocity, r._t, np.arange(int(len(r.velocity))))
-            r.diffusivity = r.green_kubo_(r.velocity, r._t, r.vacf)
-            state['results'][n]['diffusivity'] = r.diffusivity
-
-        if any('Confinement' in feature for feature in selected):
-            if not hasattr(r, 'diffusivity'):
+            try:
                 r.velocity = r.velocity_(r._r, r._t)
                 r.vacf = r.stationary_velocity_correlation_(r.velocity, r._t, np.arange(int(len(r.velocity))))
                 r.diffusivity = r.green_kubo_(r.velocity, r._t, r.vacf)
-            if not hasattr(r, '_r0'):
-                r.fractal_dimension, r._r0 = r.fractal_dimension_(r._r)
-            r.confinement_probability = r.confinement_probability_(r._r0, r.diffusivity, r._t[-1])
-            state['results'][n]['confinement'] = r.confinement_probability
+                if np.isnan(r.diffusivity) or np.isinf(r.diffusivity):
+                    state['results'][n]['diffusivity'] = 'N/A'
+                else:
+                    state['results'][n]['diffusivity'] = r.diffusivity
+            except Exception as e:
+                errors.append(f"Trajectory {n + 1}: Diffusivity - {str(e)}")
+                state['results'][n]['diffusivity'] = 'Error'
+
+        if any('Confinement' in feature for feature in selected):
+            try:
+                if not hasattr(r, 'diffusivity') or (
+                        hasattr(r, 'diffusivity') and (np.isnan(r.diffusivity) or np.isinf(r.diffusivity))):
+                    r.velocity = r.velocity_(r._r, r._t)
+                    r.vacf = r.stationary_velocity_correlation_(r.velocity, r._t, np.arange(int(len(r.velocity))))
+                    r.diffusivity = r.green_kubo_(r.velocity, r._t, r.vacf)
+                if not hasattr(r, '_r0'):
+                    r.fractal_dimension, r._r0 = r.fractal_dimension_(r._r)
+                r.confinement_probability = r.confinement_probability_(r._r0, r.diffusivity, r._t[-1])
+                if np.isnan(r.confinement_probability) or np.isinf(r.confinement_probability):
+                    state['results'][n]['confinement'] = 'N/A'
+                else:
+                    state['results'][n]['confinement'] = r.confinement_probability
+            except Exception as e:
+                errors.append(f"Trajectory {n + 1}: Confinement - {str(e)}")
+                state['results'][n]['confinement'] = 'Error'
 
     if state['results']:
         first = state['results'].get(0, {})
         lines = [f"{k}: {v}" for k, v in first.items()]
-        result_box.set_text("Resultater (første trajectory):\n" + "\n".join(lines))
-        save_btn.props(remove='disabled')  # Enable the button
+        result_text = "Resultater (første trajectory):\n" + "\n".join(lines)
+
+        if errors:
+            result_text += f"\n\nWarnings/Errors ({len(errors)}):\n" + "\n".join(errors[:5])
+            if len(errors) > 5:
+                result_text += f"\n... and {len(errors) - 5} more"
+
+        result_box.set_text(result_text)
+        save_btn.props(remove='disabled')
     else:
-        result_box.set_text("Ingen resultater produsert")
+        result_box.set_text("No results produced!")
 
 
 def save_results():
@@ -280,20 +358,26 @@ def show_about():
 
 
 # UI-komponenter
+# UI-komponenter
 ui.markdown(f"# TrajPy GUI — versjon {trajpy.__version__}")
-
 
 with ui.row():
     upload = ui.upload(label='Upload one or several files (CSV or YAML)', multiple=True,
                        on_upload=handle_upload)
-upload.on_upload(handle_upload)
-with ui.row():
-    with ui.card().tight():
-        ui.label('Velg features').style('font-weight: bold')
-        checkboxes = {}
-        for feat in FEATURES:
-            cb = ui.checkbox(feat, value=False)  # ingen on_change her
-            checkboxes[feat] = cb
+
+# Create a row to place features and plot side by side
+with ui.row().style('width: 100%; gap: 20px'):
+    # Left column: Features selection
+    with ui.column().style('min-width: 300px'):
+        with ui.card().tight():
+            ui.label('Select features').style('font-weight: bold')
+            checkboxes = {}
+            for feat in FEATURES:
+                cb = ui.checkbox(feat, value=False)
+                checkboxes[feat] = cb
+
+    # Right column: Plot container
+    plot_container = ui.column().style('flex-grow: 1')
 
 with ui.row():
     about_btn = ui.button('About', on_click=lambda: show_about())
@@ -304,8 +388,7 @@ with ui.row():
     save_btn = ui.button('Save results (CSV)', on_click=lambda: save_results()).props('disabled')
     result_box = ui.label('No results yet')
 
-# Add plot container
-plot_container = ui.column().style('width: 100%')
+# Remove the old plot_container definition at the bottom
 
 
 # Start NiceGUI
