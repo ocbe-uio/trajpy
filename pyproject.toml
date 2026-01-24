@@ -1,6 +1,6 @@
 [project]
 name = "trajpy"
-version = "1.4.3"
+version = "1.4.4"
 description = "Trajpy - empowering feature engineering for trajectory analysis across domains."
 authors = [
     { name = "Maurício Moreira Soares", email = "trajpy@protonmail.ch"}
