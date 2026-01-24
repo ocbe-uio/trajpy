@@ -6,7 +6,7 @@ import numpy as np
 def weierstrass_mandelbrot(t: float, n_displacements: int, alpha: float) -> float:
     """
     Calculates the weierstrass mandelbrot function
-    
+
     .. math::
         W(t) = \\sum_{n=-\\infty}^{\\infty} \\frac{\\cos{(\\phi_n )} - \\cos{(\\gamma^n t^* + \\phi_n )} }{\\gamma^{n\\alpha/2}} \\, .
 
@@ -16,14 +16,15 @@ def weierstrass_mandelbrot(t: float, n_displacements: int, alpha: float) -> floa
     :return: anomalous step
     """
     gamma = np.sqrt(np.pi)
-    t_star = (2. * np.pi * t) / n_displacements
+    t_star = (2.0 * np.pi * t) / n_displacements
 
-    wsm = 0.
+    wsm = 0.0
 
     for iteration in range(-8, 49):  # [-8, 48]
-        phi = 2. * np.random.rand() * np.pi
-        wsm += (np.cos(phi) - np.cos(np.power(gamma, iteration) * t_star + phi)) / \
-               (np.power(gamma, iteration * (alpha / 2.)))
+        phi = 2.0 * np.random.rand() * np.pi
+        wsm += (np.cos(phi) - np.cos(np.power(gamma, iteration) * t_star + phi)) / (
+            np.power(gamma, iteration * (alpha / 2.0))
+        )
     return wsm
 
 
@@ -41,7 +42,6 @@ def anomalous_diffusion(n_steps: int, n_samples: int, time_step: float, alpha: f
     y = np.zeros((n_steps, n_samples))
 
     for i_sample in range(0, n_samples):
-
         for i_step in range(0, n_steps):
             t = i_step * time_step
             y[i_step, i_sample] = weierstrass_mandelbrot(t, n_steps, alpha=alpha)
@@ -63,12 +63,14 @@ def normal_distribution(u: float, D: float, dt: float) -> float:
     :return pdf: probability density function
 
     """
-    diff = 4. * D * dt
-    pdf = ((2. * u) / diff) * np.exp(-np.power(u, 2) / diff)
+    diff = 4.0 * D * dt
+    pdf = ((2.0 * u) / diff) * np.exp(-np.power(u, 2) / diff)
     return pdf
 
 
-def normal_diffusion(n_steps: int, n_samples: int, dx: float, y0: float, D: float, dt: float) -> Tuple[np.ndarray, np.ndarray]:
+def normal_diffusion(
+    n_steps: int, n_samples: int, dx: float, y0: float, D: float, dt: float
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generates an ensemble of normal diffusion trajectories.
 
@@ -80,48 +82,47 @@ def normal_diffusion(n_steps: int, n_samples: int, dx: float, y0: float, D: floa
     :param dt: time step
     :return x, y: time, array containing N_samples trajectories with N_steps
     """
-    
+
     y = np.zeros((n_steps, n_samples))
-    x = np.linspace(0, n_steps, n_steps) 
+    x = np.linspace(0, n_steps, n_steps)
     y[0, :] = y0
-    
+
     for i_sample in range(0, n_samples):
         i_step = 1
         while True:
-            
             if i_step >= n_steps:
                 break
-            
+
             random_number = np.random.rand()
             u = (0.5 - random_number) * dx  # step length and direction
             if random_number >= normal_distribution(np.abs(u), D, dt):
-                y[i_step, i_sample] = y[i_step-1, i_sample] + u
+                y[i_step, i_sample] = y[i_step - 1, i_sample] + u
 
-            i_step += 1       
+            i_step += 1
     return x, y
 
 
-def confined_diffusion(radius: float, n_steps: int, n_samples: int, dx: float, y0: float, D: float, dt: float) -> Tuple[np.ndarray, np.ndarray]:
+def confined_diffusion(
+    radius: float, n_steps: int, n_samples: int, dx: float, y0: float, D: float, dt: float
+) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generates trajectories under confinement.
 
     :param radius: confinement radius
     :param n_steps: number of displacements
     :param n_samples: number of trajectories
-    :param dx: displacement 
+    :param dx: displacement
     :param y0: initial position
     :param D: diffusion coefficient
     :param dt: time step
     :return x, y: time, array containing N_samples trajectories with N_steps
     """
     y = np.zeros((n_steps, n_samples))
-    x = np.linspace(0, n_steps, n_steps) 
+    x = np.linspace(0, n_steps, n_steps)
     y[0, :] = y0
     sub_step = 0.0
-    for i_sample in range(0, n_samples):  
-       
+    for i_sample in range(0, n_samples):
         for i_step in range(0, n_steps):
-            
             sub_x, sub_y = normal_diffusion(n_steps=100, n_samples=1, dx=dx, y0=sub_step, D=D, dt=dt)
 
             if sub_y[-1, 0] < radius:
@@ -133,12 +134,14 @@ def confined_diffusion(radius: float, n_steps: int, n_samples: int, dx: float, y
     return x, y
 
 
-def superdiffusion(velocity: float, n_steps: int, n_samples: int, y0: float, dt: float) -> Tuple[np.ndarray, np.ndarray]:
+def superdiffusion(
+    velocity: float, n_steps: int, n_samples: int, y0: float, dt: float
+) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Generates direct diffusion trajectories. 
+    Generates direct diffusion trajectories.
     Combine pairwise with normal diffusion components.
-    
-    :param velocity: constant velocity 
+
+    :param velocity: constant velocity
     :param n_steps: number of time steps
     :param n_samples: number of trajectories
     :param y0: initial position
@@ -146,15 +149,14 @@ def superdiffusion(velocity: float, n_steps: int, n_samples: int, y0: float, dt:
     :return x, y: time, array containing N_samples trajectories with N_steps
     """
     y = np.zeros((n_steps, n_samples))
-    x = np.linspace(0, n_steps, n_steps) 
+    x = np.linspace(0, n_steps, n_steps)
     y[0, :] = y0
-    
-    for i_sample in range(0,n_samples):  
-       
+
+    for i_sample in range(0, n_samples):
         for i_step in range(1, n_steps):
-            y[i_step, i_sample] = y[i_step-1, i_sample] + velocity * dt
+            y[i_step, i_sample] = y[i_step - 1, i_sample] + velocity * dt
             x[i_step] = i_step * dt
-            
+
     return x, y
 
 
@@ -166,6 +168,11 @@ def save_to_file(y: np.ndarray, param: Union[int, float, str], path: str) -> Non
     :param param: a parameter that characterizes the kind of trajectory
     :param path: path to the folder where the file will be saved
     """
-    dims = ['x','y']
-    np.savetxt(path + '/traj_' + str(param) + '.csv',y,delimiter=',',
-      header='t,'+(",".join(dims[:y.shape[1]]*int((y.shape[1])/2))),comments='')
+    dims = ["x", "y"]
+    np.savetxt(
+        path + "/traj_" + str(param) + ".csv",
+        y,
+        delimiter=",",
+        header="t," + (",".join(dims[: y.shape[1]] * int((y.shape[1]) / 2))),
+        comments="",
+    )
