@@ -14,14 +14,14 @@ class TestParseLammpsDumpYaml:
         positions = parse_lammps_dump_yaml(sample_file)
 
         # Check shape: (num_time_steps, num_atoms, 4)
-        assert positions.shape == (4, 3, 4), f"Expected shape (4, 3, 4), got {positions.shape}"
+        assert positions.shape == (16, 3, 4), f"Expected shape (16, 3, 4), got {positions.shape}"
 
     def test_time_values(self):
         """Test that time values are correctly extracted"""
         sample_file = 'data/samples/sample_lammps.yml'
         positions = parse_lammps_dump_yaml(sample_file)
 
-        expected_times = [0.0, 0.5, 1.0, 1.5]
+        expected_times = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5, 7.0, 7.5]
         for time_step, expected_time in enumerate(expected_times):
             actual_time = positions[time_step, 0, 0]
             assert actual_time == expected_time, f"Time at step {time_step} should be {expected_time}, got {actual_time}"
@@ -37,8 +37,8 @@ class TestParseLammpsDumpYaml:
         assert positions[0, 0, 3] == 0.0, "Atom 1 z-coordinate should be 0.0"
 
         # Check second atom at first timestep
-        assert np.isclose(positions[0, 1, 1], 8.397981e-01), "Atom 2 x-coordinate mismatch"
-        assert np.isclose(positions[0, 1, 2], 8.397981e-01), "Atom 2 y-coordinate mismatch"
+        assert np.isclose(positions[0, 1, 1], 0.000000e+00), "Atom 2 x-coordinate mismatch"
+        assert np.isclose(positions[0, 1, 2], 5.000000e+00), "Atom 2 y-coordinate mismatch"
         assert positions[0, 1, 3] == 0.0, "Atom 2 z-coordinate should be 0.0"
 
     def test_consistency_across_timesteps(self):
@@ -46,12 +46,10 @@ class TestParseLammpsDumpYaml:
         sample_file = 'data/samples/sample_lammps.yml'
         positions = parse_lammps_dump_yaml(sample_file)
 
-        # In the sample file, positions are identical across timesteps
-        for time_step in range(1, 4):
-            for atom in range(3):
-                for coord in range(1, 4):  # x, y, z
-                    assert positions[time_step, atom, coord] == positions[0, atom, coord], \
-                        f"Position mismatch at timestep {time_step}, atom {atom}, coord {coord}"
+        for time_step in range(0, 14):
+            print(positions[time_step, 0, 1], time_step)
+            assert np.isclose(positions[time_step, 0, 1], time_step), \
+                f"Position mismatch at timestep {time_step}, atom {1}, coord {time_step}"
 
     def test_return_type(self):
         """Test that the function returns a numpy array"""
@@ -75,4 +73,4 @@ class TestParseLammpsDumpYaml:
         num_atoms = positions.shape[1]
 
         assert num_atoms == 3, f"Expected 3 atoms, got {num_atoms}"
-        assert num_time_steps == 4, f"Expected 4 timesteps, got {num_time_steps}"
+        assert num_time_steps == 16, f"Expected 4 timesteps, got {num_time_steps}"

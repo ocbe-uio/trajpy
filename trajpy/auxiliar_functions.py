@@ -32,32 +32,32 @@ def parse_lammps_dump_yaml(filename):
         the fourth column contains the z coordinates.
 
     """
-    with open(filename, 'r') as file:
-        documents = list(yaml.load_all(file, Loader = yaml.FullLoader))
-    
-        # retrieving column names to assure consistency 
-        # if the order of the columns changes in lammps 
+    with open(filename, "r") as file:
+        documents = list(yaml.load_all(file, Loader=yaml.FullLoader))
+
+        # retrieving column names to assure consistency
+        # if the order of the columns changes in lammps
         # yaml file standard
         keys = documents[0]["keywords"]
         column_dict = {key: index for index, key in enumerate(keys)}
 
         num_time_steps = len(documents)
-        num_atoms = documents[0]['natoms']
+        num_atoms = documents[0]["natoms"]
         positions = np.zeros((num_time_steps, num_atoms, 4))
 
         for time_step, data in enumerate(documents):
-
             for atom_index, atom_properties in enumerate(data["data"]):
-
                 positions[time_step, atom_index, 0] = data["time"]
-                positions[time_step, atom_index, 1] = atom_properties[column_dict['x']]
-                positions[time_step, atom_index, 2] = atom_properties[column_dict['y']]
-                positions[time_step, atom_index, 3] = atom_properties[column_dict['z']]
+                positions[time_step, atom_index, 1] = atom_properties[column_dict["x"]]
+                positions[time_step, atom_index, 2] = atom_properties[column_dict["y"]]
+                positions[time_step, atom_index, 3] = atom_properties[column_dict["z"]]
 
     return positions
 
 
-def moment_(trajectory: np.ndarray, order: int = 2, l_size: np.ndarray = np.array([0, 0]), periodic: bool = False) -> float:
+def moment_(
+    trajectory: np.ndarray, order: int = 2, l_size: np.ndarray = np.array([0, 0]), periodic: bool = False
+) -> float:
     """
     Calculates the n-th statistical moment of the trajectory r.
 
@@ -75,7 +75,6 @@ def moment_(trajectory: np.ndarray, order: int = 2, l_size: np.ndarray = np.arra
     n_points = len(trajectory)
 
     for n in range(0, n_points - 1):
-
         dr = trajectory[n + 1] - trajectory[n]
 
         if periodic:
@@ -83,6 +82,7 @@ def moment_(trajectory: np.ndarray, order: int = 2, l_size: np.ndarray = np.arra
 
         moment[n] = np.sum(np.power(dr, order))
     return np.sum(moment) / (n_points - 1)
+
 
 def einstein_diffusion_probability(r: Union[float, np.ndarray], D: float, t: float) -> Union[float, np.ndarray]:
     """
@@ -98,25 +98,25 @@ def einstein_diffusion_probability(r: Union[float, np.ndarray], D: float, t: flo
     :param t: time length
     :return probability: probability of arriving in r.
     """
-    A = 1. / np.power(4. * np.pi * D * t, 0.5)
-    probability = A * np.exp(-np.power(r, 2) / (4. * D * t))
+    A = 1.0 / np.power(4.0 * np.pi * D * t, 0.5)
+    probability = A * np.exp(-np.power(r, 2) / (4.0 * D * t))
     return probability
 
 
-def unfold (r_old: np.ndarray, r: np.ndarray, box: Union[float, np.ndarray]) -> np.ndarray:
+def unfold(r_old: np.ndarray, r: np.ndarray, box: Union[float, np.ndarray]) -> np.ndarray:
     """
     Removes effects of periodic boundaries on particle trajectories.
-    r_old is the configuration at the previous step 
+    r_old is the configuration at the previous step
     r is the current configuration
     box is accessed from the calling program.
     The function returns the unfolded version of r.
-    
+
     From the book: Computer Simulation of Liquids
     git: github.com/Allen-Tildesley/
     Authors: Michael P. Allen and Dominic J. Tildesley
     """
 
-    r_new = r - r_old                      #  Convert r to displacements relative to r_old
-    r_new = r_new - np.rint(r_new/box)*box # Apply periodic boundaries to displacements
-    r_new = r_new + r_old                  # Convert r back to absolute coordinates
+    r_new = r - r_old  #  Convert r to displacements relative to r_old
+    r_new = r_new - np.rint(r_new / box) * box  # Apply periodic boundaries to displacements
+    r_new = r_new + r_old  # Convert r back to absolute coordinates
     return r_new

@@ -36,4 +36,4 @@ jobs:
         uv run ruff check .
     - name: Test with pytest
       run: |
-        uv run pytest --cov=src tests/
+        uv run pytest --cov=trajpy tests/

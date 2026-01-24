@@ -32,7 +32,7 @@ the generator for building your own database.
 
 We have the package hosted at PyPi, for installing use the command line: 
 ```bash
-pip3 install trajpy
+pip3 install trajpy trajpy-ui
 ```
 If you want to test the development version, clone the repository at your local directory from your terminal:
 ```bash
@@ -46,23 +46,13 @@ python setup.py --install
 ## Basic Usage Example
 
 ### Using the Graphic User Interface (GUI)
+Since the version 1.4.4 we moved the user interface to a separate package named `trajpy-ui`.
 
 Open a terminal and execute the line bellow
 ```bash
-python3 -m trajpy.gui
+python3 -m trajpy_ui.ui
 ```
-
-1 - You can open one file at time clicking on `Open file...` or process several files in the same director with `Open directory...`
-
-2 - Select the features to be computed by ticking the boxes
-
-3 - Click on `Compute`
-
-4 - Select the directory and file name where the results will be stored
-
-The processing is ready when the following message appears in the text box located at the bottom of the GUI:
-
-`Results saved to /path/to/results/output.csv`
+Check the respository [trajpy-ui](https://ocbe-uio.github.io/trajpy-ui/) for more details about the GUI.
 
 ### File formats
 
