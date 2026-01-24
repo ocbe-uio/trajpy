@@ -46,13 +46,13 @@ python setup.py --install
 ## Basic Usage Example
 
 ### Using the Graphic User Interface (GUI)
+Since the version 1.4.4 we moved the user interface to a separate package named `trajpy-ui`.
 
 Open a terminal and execute the line bellow
 ```bash
 python3 -m trajpy_ui.ui
 ```
 Check the respository [trajpy-ui](https://ocbe-uio.github.io/trajpy-ui/) for more details about the GUI.
-
 
 ### File formats
 
