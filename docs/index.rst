@@ -12,6 +12,8 @@ Contents:
    intro
    installation
    tutorial
+   synthetic_data_generator
+   publications
    modules_index
 
 
