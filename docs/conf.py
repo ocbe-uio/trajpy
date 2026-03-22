@@ -26,9 +26,9 @@ copyright = '2019, phydev'
 author = 'Mauricio Moreira-Soares'
 
 # The short X.Y version
-version = ''
+version = '1.4'
 # The full version, including alpha/beta/rc tags
-release = '1.3.1'
+release = '1.4.4'
 
 
 # -- General configuration ---------------------------------------------------

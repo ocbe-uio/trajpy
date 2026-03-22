@@ -12,6 +12,7 @@ Contents:
    intro
    installation
    tutorial
+   synthetic_data_generator
    modules_index
 
 
