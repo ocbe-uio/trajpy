@@ -34,6 +34,9 @@ jobs:
     - name: Lint with ruff
       run: |
         uv run ruff check .
+    - name: Security scan with bandit
+      run: |
+        uv run bandit -r trajpy
     - name: Test with pytest
       run: |
         uv run pytest --cov=trajpy tests/

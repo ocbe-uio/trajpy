@@ -1,4 +1,4 @@
-.PHONY: check-format fix test lint type-check all
+.PHONY: check-format fix test lint type-check security all
 
 check-format:
 	.venv/bin/ruff format trajpy --check
@@ -16,4 +16,7 @@ lint:
 type-check:
 	.venv/bin/pyright trajpy
 
-all: lint type-check check-format fix test
+security:
+	.venv/bin/bandit -r trajpy
+
+all: lint type-check check-format fix test security
